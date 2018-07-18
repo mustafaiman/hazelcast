@@ -18,7 +18,8 @@ package com.hazelcast.internal.management;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.internal.management.request.ChangeWanStateRequest;
-import com.hazelcast.internal.json.JsonObject;
+import com.hazelcast.json.Json;
+import com.hazelcast.json.JsonObject;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.annotation.ParallelTest;
@@ -46,7 +47,7 @@ public class ChangeWanStateRequestTest extends HazelcastTestSupport {
     @Test
     public void testResumingWanState() throws Exception {
         ChangeWanStateRequest changeWanStateRequest = new ChangeWanStateRequest("schema", "publisher", true);
-        JsonObject jsonObject = new JsonObject();
+        JsonObject jsonObject = Json.object();
         changeWanStateRequest.writeResponse(managementCenterService, jsonObject);
 
         JsonObject result = (JsonObject) jsonObject.get("result");
@@ -56,7 +57,7 @@ public class ChangeWanStateRequestTest extends HazelcastTestSupport {
     @Test
     public void testPausingWanState() throws Exception {
         ChangeWanStateRequest changeWanStateRequest = new ChangeWanStateRequest("schema", "publisher", false);
-        JsonObject jsonObject = new JsonObject();
+        JsonObject jsonObject = Json.object();
         changeWanStateRequest.writeResponse(managementCenterService, jsonObject);
 
         JsonObject result = (JsonObject) jsonObject.get("result");
