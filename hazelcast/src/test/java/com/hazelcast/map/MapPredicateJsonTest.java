@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -116,17 +117,20 @@ public class MapPredicateJsonTest extends HazelcastTestSupport {
 
     @Test
     public void testQueryOnNumberProperty() {
-        IMap<String, JsonValue> map = instance.getMap(randomMapName());
+        Random random = new Random();
+        JsonObject o = Json.object();
+        o.set("stringVam", "" + random.nextInt(10) + random.nextInt(10));
+        o.set("a", random.nextDouble());
+        o.set("b", random.nextDouble());
+        o.set("c", random.nextDouble());
+        o.set("d", random.nextDouble());
+        o.set("e", random.nextDouble());
+        o.set("f", random.nextDouble());
 
-        JsonValue p1 = putJsonString(map, "a", 30, true);
-        JsonValue p2 = putJsonString(map, "b", 20, false);
-        JsonValue p3 = putJsonString(map, "c", 10, true);
 
-        Collection<JsonValue> vals = map.values(Predicates.greaterEqual("age", 20));
-
-        assertEquals(2, vals.size());
-        assertTrue(vals.contains(p1));
-        assertTrue(vals.contains(p2));
+        IMap map = instance.getMap(randomMapName());
+        map.put(1, o);
+        System.out.println(map.keySet(Predicates.notEqual("stringVam", "11")));
     }
 
     @Test
