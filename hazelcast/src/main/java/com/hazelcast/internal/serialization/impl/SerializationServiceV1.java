@@ -74,7 +74,7 @@ import static com.hazelcast.internal.serialization.impl.JavaDefaultSerializers.C
 import static com.hazelcast.internal.serialization.impl.JavaDefaultSerializers.DateSerializer;
 import static com.hazelcast.internal.serialization.impl.JavaDefaultSerializers.EnumSerializer;
 import static com.hazelcast.internal.serialization.impl.JavaDefaultSerializers.JavaSerializer;
-import static com.hazelcast.internal.serialization.impl.JavaDefaultSerializers.JsonStringSerializer;
+import static com.hazelcast.internal.serialization.impl.JavaDefaultSerializers.DefaultJsonSerializer;
 import static com.hazelcast.internal.serialization.impl.SerializationUtil.createSerializerAdapter;
 import static com.hazelcast.util.MapUtil.createHashMap;
 
@@ -178,7 +178,7 @@ public class SerializationServiceV1 extends AbstractSerializationService {
         registerConstant(Enum.class, new EnumSerializer());
         registerConstant(ArrayList.class, new ArrayListStreamSerializer());
         registerConstant(LinkedList.class, new LinkedListStreamSerializer());
-        registerConstant(JsonValue.class, new JsonStringSerializer());
+        registerConstant(JsonValue.class, new DefaultJsonSerializer());
 
         safeRegister(Serializable.class, javaSerializerAdapter);
         safeRegister(Externalizable.class, javaExternalizableAdapter);

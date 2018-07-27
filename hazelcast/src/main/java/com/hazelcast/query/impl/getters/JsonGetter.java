@@ -16,17 +16,26 @@
 
 package com.hazelcast.query.impl.getters;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonTokenId;
 import com.hazelcast.json.JsonArray;
 import com.hazelcast.json.JsonValue;
+import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.HazelcastSerializationException;
 
+import java.io.IOException;
 import java.util.Iterator;
 
+import static com.hazelcast.internal.serialization.impl.HeapData.HEAP_DATA_OVERHEAD;
 import static com.hazelcast.util.EmptyStatement.ignore;
 
 public class JsonGetter extends Getter {
 
     private static final String DELIMITER = "\\.";
+
+    private JsonFactory factory = new JsonFactory();
 
     public JsonGetter() {
         super(null);
@@ -42,7 +51,55 @@ public class JsonGetter extends Getter {
     }
 
     @Override
-    Object getValue(Object obj, String attributePath) {
+    Object getValue(Object obj, String attributePath) throws IOException {
+        if (obj instanceof Data) {
+            return getValueFromBinary((Data) obj, attributePath);
+        } else if (obj instanceof JsonValue) {
+            return getValueFromObject(obj, attributePath);
+        } else {
+            throw new HazelcastSerializationException("object is not JsonValue or Data");
+        }
+    }
+
+    protected Object getValueFromBinary(Data data, String attributePath) throws IOException {
+        String[] paths = getPath(attributePath);
+        JsonParser parser = factory.createParser(data.toByteArray(), HEAP_DATA_OVERHEAD + 4, data.dataSize() - 4);
+        int index = 0;
+        while (index < paths.length && parser.getCurrentToken() != JsonToken.END_OBJECT) {
+            String path = paths[index];
+            parser.nextValue();
+            String currentName = parser.getCurrentName();
+            if (path.equals(currentName)) {
+                index++;
+            }
+        }
+        Object ret = null;
+        if (index == paths.length) {
+            ret = convertJsonTokenToValue(parser);
+        }
+        parser.close();
+        return ret;
+    }
+
+    private Object convertJsonTokenToValue(JsonParser parser) throws IOException {
+        int token = parser.getCurrentTokenId();
+        switch (token) {
+            case JsonTokenId.ID_STRING:
+                return parser.getValueAsString();
+            case JsonTokenId.ID_NUMBER_INT:
+                return parser.getIntValue();
+            case JsonTokenId.ID_NUMBER_FLOAT:
+                return parser.getValueAsDouble();
+            case JsonTokenId.ID_TRUE:
+                return true;
+            case JsonTokenId.ID_FALSE:
+                return false;
+            default:
+                return null;
+        }
+    }
+
+    protected Object getValueFromObject(Object obj, String attributePath) {
         String[] paths = getPath(attributePath);
         JsonValue value = (JsonValue) obj;
         if (value.isObject()) {

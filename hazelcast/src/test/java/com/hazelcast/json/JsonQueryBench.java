@@ -25,34 +25,39 @@ import com.hazelcast.query.Predicates;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
 
 import java.util.Random;
 
+import static com.hazelcast.json.Benches.CLUSTER_SIZE;
 import static com.hazelcast.json.Benches.IN_MEMORY_FORMAT;
+import static com.hazelcast.json.Benches.MAP_SIZE;
 import static com.hazelcast.json.Benches.QUERY_ATTRIBUTE_NAME;
 
 public class JsonQueryBench {
-
-    private final static int MAP_SIZE = 5000;
 
     @State(Scope.Benchmark)
     public static class Hazel {
 
         Random random;
-        HazelcastInstance instance;
+        HazelcastInstance[] instances;
         IMap map;
 
         @Setup(Level.Trial)
         public void setup() {
             Config config = new Config();
             config.getMapConfig("default").setInMemoryFormat(IN_MEMORY_FORMAT);
-            instance = Hazelcast.newHazelcastInstance(config);
-            map = instance.getMap("test");
+            instances = new HazelcastInstance[CLUSTER_SIZE];
+            for (int i = 0; i < CLUSTER_SIZE; i++) {
+                instances[i] = Hazelcast.newHazelcastInstance(config);
+            }
+            map = instances[0].getMap("test");
             random = new Random();
 
             fillMap(map);
@@ -60,17 +65,19 @@ public class JsonQueryBench {
 
         @TearDown(Level.Trial)
         public void tearDown() {
-            instance.shutdown();
+            for (int i = 0; i < CLUSTER_SIZE; i++) {
+                instances[i].shutdown();
+            }
         }
 
         private void fillMap(IMap map) {
             for (int i = 0; i < MAP_SIZE; i++) {
                 JsonObject o = Json.object();
-                o.set(QUERY_ATTRIBUTE_NAME, "" + random.nextInt(10) + random.nextInt(10));
                 o.set("a", random.nextDouble());
                 o.set("b", random.nextDouble());
                 o.set("c", random.nextDouble());
                 o.set("d", random.nextDouble());
+                o.set(QUERY_ATTRIBUTE_NAME, "" + random.nextInt(10) + random.nextInt(10) + random.nextInt(10));
                 o.set("e", random.nextDouble());
                 o.set("f", random.nextDouble());
                 map.put(i, o);
@@ -80,7 +87,9 @@ public class JsonQueryBench {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
+    @Measurement(iterations = 2)
+    @Warmup(iterations = 1)
     public void bensc(Hazel hazel) {
-        hazel.map.keySet(Predicates.equal(QUERY_ATTRIBUTE_NAME, "11"));
+        hazel.map.keySet(Predicates.equal(QUERY_ATTRIBUTE_NAME, "1112"));
     }
 }
