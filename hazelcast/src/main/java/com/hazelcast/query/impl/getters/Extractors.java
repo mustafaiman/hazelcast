@@ -18,6 +18,7 @@ package com.hazelcast.query.impl.getters;
 
 import com.hazelcast.config.MapAttributeConfig;
 import com.hazelcast.internal.serialization.InternalSerializationService;
+import com.hazelcast.internal.serialization.impl.SerializationConstants;
 import com.hazelcast.json.JsonValue;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.query.QueryException;
@@ -39,6 +40,7 @@ public final class Extractors {
     private static final float EVICTION_PERCENTAGE = 0.2f;
 
     private volatile PortableGetter genericPortableGetter;
+    private volatile JsonGetter genericJsonGetter;
 
     /**
      * Maps the extractorAttributeName WITHOUT the arguments to a ValueExtractor instance.
@@ -80,7 +82,11 @@ public final class Extractors {
             targetData = (Data) target;
             if (targetData.isPortable()) {
                 return targetData;
-            } else {
+            }
+            else if (targetData.getType() == SerializationConstants.JAVA_DEFAULT_TYPE_JSON) {
+                return targetData;
+            }
+            else {
                 // convert non-portable Data to object
                 return serializationService.toObject(target);
             }
@@ -110,11 +116,13 @@ public final class Extractors {
         } else {
             if (targetObject instanceof Data) {
                 //targetObject may be a Data whose object form is a json?
-                if (genericPortableGetter == null) {
+                if (genericPortableGetter == null && ((Data) targetObject).isPortable()) {
                     // will be initialised a couple of times in the worst case
                     genericPortableGetter = new PortableGetter(serializationService);
+                } else if (genericJsonGetter == null) {
+                    genericJsonGetter = new JsonGetter();
                 }
-                return genericPortableGetter;
+                return ((Data) targetObject).isPortable() ? genericPortableGetter: genericJsonGetter;
             } else if (targetObject instanceof JsonValue) {
                 return new JsonGetter();
             } else {

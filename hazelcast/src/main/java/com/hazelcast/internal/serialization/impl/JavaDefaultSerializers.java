@@ -45,7 +45,7 @@ import static com.hazelcast.internal.serialization.impl.SerializationConstants.J
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_DATE;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_ENUM;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_EXTERNALIZABLE;
-import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_JSON_STRING;
+import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_JSON;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_SERIALIZABLE;
 import static com.hazelcast.nio.IOUtil.newObjectInputStream;
 import static java.lang.Math.max;
@@ -325,7 +325,7 @@ public final class JavaDefaultSerializers {
         }
     }
 
-    public static final class JsonStringSerializer extends SingletonSerializer<JsonValue> {
+    public static final class DefaultJsonSerializer extends SingletonSerializer<JsonValue> {
 
         @Override
         public void write(ObjectDataOutput out, JsonValue object) throws IOException {
@@ -340,7 +340,7 @@ public final class JavaDefaultSerializers {
 
         @Override
         public int getTypeId() {
-            return JAVA_DEFAULT_TYPE_JSON_STRING;
+            return JAVA_DEFAULT_TYPE_JSON;
         }
     }
 

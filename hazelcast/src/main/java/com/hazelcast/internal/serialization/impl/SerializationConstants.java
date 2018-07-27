@@ -80,7 +80,7 @@ public final class SerializationConstants {
 
     public static final int JAVA_DEFAULT_TYPE_LINKED_LIST = -27;
 
-    public static final int JAVA_DEFAULT_TYPE_JSON_STRING = -28;
+    public static final int JAVA_DEFAULT_TYPE_JSON = -28;
 
     // NUMBER OF CONSTANT SERIALIZERS...
     public static final int CONSTANT_SERIALIZERS_LENGTH = 29;

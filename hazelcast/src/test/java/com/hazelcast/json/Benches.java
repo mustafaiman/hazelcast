@@ -22,4 +22,6 @@ public class Benches {
 
     public static InMemoryFormat IN_MEMORY_FORMAT = InMemoryFormat.BINARY;
     public static String QUERY_ATTRIBUTE_NAME = "stringVam";
+    public static int CLUSTER_SIZE = 1;
+    public static int MAP_SIZE = 10000;
 }
