@@ -16,10 +16,10 @@
 
 package com.hazelcast.query.impl.getters;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import com.hazelcast.json.JsonArray;
 import com.hazelcast.json.JsonValue;
 import com.hazelcast.nio.serialization.Data;
@@ -35,7 +35,7 @@ public class JsonGetter extends Getter {
 
     private static final String DELIMITER = "\\.";
 
-    private JsonFactory factory = new JsonFactory();
+    private CBORFactory factory = new CBORFactory();
 
     public JsonGetter() {
         super(null);

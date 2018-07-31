@@ -16,6 +16,9 @@
 
 package com.hazelcast.internal.serialization.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import com.hazelcast.json.Json;
 import com.hazelcast.json.JsonValue;
 import com.hazelcast.nio.BufferObjectDataInput;
@@ -327,15 +330,22 @@ public final class JavaDefaultSerializers {
 
     public static final class DefaultJsonSerializer extends SingletonSerializer<JsonValue> {
 
+        private CBORFactory cborFactory = new CBORFactory();
+        private ObjectMapper objectMapper = new ObjectMapper(cborFactory);
+        private ObjectMapper stringObjectMapper = new ObjectMapper();
+
         @Override
         public void write(ObjectDataOutput out, JsonValue object) throws IOException {
             String stringJson = object.toString();
-            out.writeUTF(stringJson);
+            JsonNode node = stringObjectMapper.readValue(stringJson, JsonNode.class);
+            out.writeByteArray(objectMapper.writeValueAsBytes(node));
         }
 
         @Override
         public JsonValue read(ObjectDataInput in) throws IOException {
-            return Json.parse(in.readUTF());
+            byte[] arr = in.readByteArray();
+            JsonNode node = objectMapper.readValue(arr, JsonNode.class);
+            return Json.parse(node.toString());
         }
 
         @Override
