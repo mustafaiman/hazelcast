@@ -33,7 +33,7 @@ import java.util.Set;
  * Greater Less Predicate
  */
 @BinaryInterface
-public final class GreaterLessPredicate extends AbstractIndexAwarePredicate implements NegatablePredicate {
+public class GreaterLessPredicate extends AbstractIndexAwarePredicate implements NegatablePredicate {
 
     private static final long serialVersionUID = 1L;
 

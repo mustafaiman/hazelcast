@@ -55,8 +55,10 @@ public class PredicateDataSerializerHook
     public static final int PAGING_PREDICATE = 15;
     public static final int PARTITION_PREDICATE = 16;
     public static final int NULL_OBJECT = 17;
+    public static final int JSON_GREATER_LESS_PREDICATE = 18;
+    public static final int JSON_EQUAL_PREDICATE = 19;
 
-    public static final int LEN = NULL_OBJECT + 1;
+    public static final int LEN = JSON_EQUAL_PREDICATE + 1;
 
     @Override
     public int getFactoryId() {
@@ -155,6 +157,18 @@ public class PredicateDataSerializerHook
         constructors[NULL_OBJECT] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
             public IdentifiedDataSerializable createNew(Integer arg) {
                 return new IndexImpl.NullObject();
+            }
+        };
+        constructors[JSON_EQUAL_PREDICATE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            @Override
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new JsonEqualWithFilteringPredicate();
+            }
+        };
+        constructors[JSON_GREATER_LESS_PREDICATE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            @Override
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new JsonGreaterLessWithFilteringPredicate();
             }
         };
 
