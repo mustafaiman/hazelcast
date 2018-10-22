@@ -42,7 +42,7 @@ public class ExperimentalParserBenchmark {
 
     protected static final int K = 1000;
     protected static final int M = 1000000;
-    private static final int JSON_OBJECT_COUNT = 1 * K;
+    private static final int JSON_OBJECT_COUNT = 10 * K;
     private static final int INT_BOUND = M;
     private static final Random random = new Random();
 
@@ -78,14 +78,14 @@ public class ExperimentalParserBenchmark {
     public void experimentalParser(JsonState state, Blackhole blackhole) {
         for (String jsonObject: state.jsonStrings) {
             StructuralIndex index = new StructuralIndex(jsonObject);
-            CharSequence value = index.findValueByPath("objectField.1");
+            JsonValue value = index.findValueByPath("objectField.1");
             blackhole.consume(value);
         }
     }
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public void a_onlyIndexing_experimentalParser(JsonState state, Blackhole blackhole) {
+    public void y_onlyIndexing_experimentalParser(JsonState state, Blackhole blackhole) {
         for (String jsonObject: state.jsonStrings) {
             StructuralIndex index = new StructuralIndex(jsonObject);
             blackhole.consume(index);
@@ -112,6 +112,36 @@ public class ExperimentalParserBenchmark {
                 .add("intField", INT_BOUND)
                 .add("stringField", randomString())
                 .add("objectField", Json.object()
+                        .add("1", 1)
+                        .add("2", 2)
+                        .add("3", 3));
+    }
+
+    private static JsonObject createHugeJsonObject() {
+        return Json.object()
+                .add("doubleField", random.nextDouble())
+                .add("floatField", random.nextFloat())
+                .add("someLargeField", Json.object()
+                        .add("ff1", "tr1")
+                        .add("ff2", random.nextFloat())
+                        .add("ff3", "" + random.nextInt()))
+                .add("longField", random.nextLong())
+                .add("intField", INT_BOUND)
+                .add("stringField", randomString())
+                .add("objectField", Json.object()
+                        .add("1", 1)
+                        .add("2", 2)
+                        .add("3", 3))
+                .add("doubleField", random.nextDouble())
+                .add("floatField", random.nextFloat())
+                .add("someLargeField", Json.object()
+                        .add("ff1", "tr1")
+                        .add("ff2", random.nextFloat())
+                        .add("ff3", "" + random.nextInt()))
+                .add("longField", random.nextLong())
+                .add("intField", INT_BOUND)
+                .add("stringField", randomString())
+                .add("objectField3", Json.object()
                         .add("1", 1)
                         .add("2", 2)
                         .add("3", 3));

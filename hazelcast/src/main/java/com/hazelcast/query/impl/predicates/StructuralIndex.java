@@ -16,6 +16,9 @@
 
 package com.hazelcast.query.impl.predicates;
 
+import com.hazelcast.internal.json.Json;
+import com.hazelcast.internal.json.JsonValue;
+
 import java.util.BitSet;
 import java.util.Stack;
 
@@ -62,43 +65,15 @@ public class StructuralIndex {
     }
 
     public void printQuoteIndex() {
-        for (int i = 0; i < quoteIndex.length(); i++) {
+        for (int i = 0; i < quoteIndex.size(); i++) {
             System.out.print(quoteIndex.get(i) ? "+": "-");
         }
         System.out.println();
     }
 
     private void createStructuralCharacterIndex(CharSequence text, char structuralChar, BitSet indexBitSet) {
-        for (int i = 0; i < text.length() - 8; i+=8) {
-            if (text.charAt(i) == structuralChar) {
-                indexBitSet.set(i);
-            }
-            if (text.charAt(i + 1) == structuralChar) {
-                indexBitSet.set(i + 1);
-            }
-            if (text.charAt(i + 2) == structuralChar) {
-                indexBitSet.set(i + 2);
-            }
-            if (text.charAt(i + 3) == structuralChar) {
-                indexBitSet.set(i + 3);
-            }
-            if (text.charAt(i + 4) == structuralChar) {
-                indexBitSet.set(i + 4);
-            }
-            if (text.charAt(i + 5) == structuralChar) {
-                indexBitSet.set(i + 5);
-            }
-            if (text.charAt(i + 6) == structuralChar) {
-                indexBitSet.set(i + 6);
-            }
-            if (text.charAt(i + 7) == structuralChar) {
-                indexBitSet.set(i + 7);
-            }
-        }
-        for (int i = text.length()-8; i < text.length(); i++) {
-            if (text.charAt(i) == structuralChar) {
-                indexBitSet.set(i);
-            }
+        for (int i = ((String)text).indexOf(structuralChar); i != -1; i = ((String)text).indexOf(structuralChar, i + 1)) {
+            indexBitSet.set(i);
         }
     }
 
@@ -144,12 +119,8 @@ public class StructuralIndex {
     }
 
     private boolean attributeNameMatches(int colonLoc, String attributeName) {
-        int startQuote = -1;
-        int endQuote = -1;
-        for (int loc = quoteIndex.nextSetBit(0); loc >= 0 && loc < colonLoc; loc = quoteIndex.nextSetBit(loc + 1)) {
-            startQuote = endQuote;
-            endQuote = loc;
-        }
+        int endQuote = quoteIndex.previousSetBit(colonLoc);
+        int startQuote = quoteIndex.previousSetBit(endQuote - 1);
         int index = 0;
         for (int i = startQuote + 1; i < endQuote; i++) {
             if (attributeName.charAt(index) != sequence.charAt(i)) {
@@ -160,7 +131,7 @@ public class StructuralIndex {
         return index == attributeName.length();
     }
 
-    public CharSequence findValueByPath(String attributePath) {
+    public JsonValue findValueByPath(String attributePath) {
         String[] parts = attributePath.split("\\.");
         int start = 0;
         int end = sequence.length();
@@ -184,6 +155,59 @@ public class StructuralIndex {
                 return null;
             }
         }
-        return sequence.subSequence(start, end);
+        start = skipWhitespace(start+1);
+        char c = sequence.charAt(start);
+        switch (c) {
+            case 't':
+                return Json.TRUE;
+            case 'f':
+                return Json.FALSE;
+            case '"':
+                return Json.value(readString(start + 1));
+            case '-':
+                return Json.value(readNumber(start + 1, false));
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                return Json.value(readNumber(start, true));
+            default:
+                return Json.NULL;
+
+        }
     }
+
+    private String readString(int start) {
+        int end = start;
+        while (sequence.charAt(end) != '"') {
+            end++;
+        }
+        return sequence.subSequence(start, end).toString();
+    }
+
+    private Double readNumber(int start, boolean positive) {
+        int end = start;
+        while ((sequence.charAt(end) <= '9' && sequence.charAt(end) >= '0') || sequence.charAt(end) == '.') {
+            end++;
+        }
+        return Double.parseDouble(sequence.subSequence(start, end).toString());
+    }
+
+    private int skipWhitespace(int start) {
+        while (start < sequence.length()) {
+            if (Character.isWhitespace(sequence.charAt(start))) {
+                start++;
+            } else {
+                return start;
+            }
+        }
+        return sequence.length();
+    }
+
 }

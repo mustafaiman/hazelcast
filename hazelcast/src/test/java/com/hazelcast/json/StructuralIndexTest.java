@@ -28,6 +28,8 @@ import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
 
+import static org.junit.Assert.assertEquals;
+
 @Category({QuickTest.class, ParallelTest.class})
 @RunWith(HazelcastParallelClassRunner.class)
 public class StructuralIndexTest {
@@ -51,6 +53,7 @@ public class StructuralIndexTest {
         System.out.println(jsonString);
         System.out.println(index);
         System.out.println(index.findValueByPath("a1"));
+        assertEquals(Json.value("v1"), index.findValueByPath("a1"));
     }
 
     @Test
@@ -63,13 +66,14 @@ public class StructuralIndexTest {
                 .add("a3", Json.object()
                         .add("c1", Json.object()
                                 .add("d1", "v4")
-                                .add("d2", "v5")));
+                                .add("d2", "uy")));
 
         System.out.println(value.toString());
         String jsonString = value.toString();
         StructuralIndex index = new StructuralIndex(jsonString);
         System.out.println(index);
-        System.out.println(index.findValueByPath("a3"));
+        System.out.println();
+        assertEquals(Json.value("uy"), index.findValueByPath("a3.c1.d2"));
     }
 
     @Test
