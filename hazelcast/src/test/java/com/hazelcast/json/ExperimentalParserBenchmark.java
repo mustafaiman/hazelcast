@@ -19,6 +19,7 @@ package com.hazelcast.json;
 import com.hazelcast.internal.json.Json;
 import com.hazelcast.internal.json.JsonObject;
 import com.hazelcast.internal.json.JsonValue;
+import com.hazelcast.query.impl.predicates.ExperimentalJsonParser;
 import com.hazelcast.query.impl.predicates.StructuralIndex;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -50,6 +51,7 @@ public class ExperimentalParserBenchmark {
     public static class JsonState {
 
         public List<String> jsonStrings = new ArrayList<String>();
+        public ExperimentalJsonParser parser = new ExperimentalJsonParser();
 
         @Setup(Level.Trial)
         public void setup() {
@@ -77,8 +79,7 @@ public class ExperimentalParserBenchmark {
     @BenchmarkMode(Mode.Throughput)
     public void experimentalParser(JsonState state, Blackhole blackhole) {
         for (String jsonObject: state.jsonStrings) {
-            StructuralIndex index = new StructuralIndex(jsonObject);
-            JsonValue value = index.findValueByPath("objectField.1");
+            JsonValue value = state.parser.findValue(jsonObject,"objectField.1");
             blackhole.consume(value);
         }
     }

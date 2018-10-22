@@ -19,7 +19,9 @@ package com.hazelcast.query.impl.predicates;
 import com.hazelcast.internal.json.Json;
 import com.hazelcast.internal.json.JsonValue;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Stack;
 
 public class StructuralIndex {
@@ -131,15 +133,42 @@ public class StructuralIndex {
         return index == attributeName.length();
     }
 
-    public JsonValue findValueByPath(String attributePath) {
+    public JsonValue findValueByPattern(List<Integer> pattern, String attributePath) {
         String[] parts = attributePath.split("\\.");
+        int start = 0;
+        int end = sequence.length();
+        int level = 0;
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i];
+            BitSet levelMap = levelIndex[level];
+            for (int j = 0, colonLoc = levelMap.nextSetBit(start); j <= pattern.get(i) && colonLoc >= 0 && colonLoc < end; j++, colonLoc = levelMap.nextSetBit(colonLoc + 1)) {
+                start = colonLoc;
+            }
+            if (attributeNameMatches(start, part)) {
+                int tempEnd = levelMap.nextSetBit(start + 1);
+                if (tempEnd != -1) {
+                    end = tempEnd;
+                }
+                level++;
+            } else {
+                return null;
+            }
+        }
+        return readJsonValue(start);
+    }
+
+    public List<Integer> findPattern(String attributePath) {
+        String[] parts = attributePath.split("\\.");
+        ArrayList<Integer> pattern = new ArrayList<>();
         int start = 0;
         int end = sequence.length();
         int level = 0;
         for (String part: parts) {
             BitSet levelMap = levelIndex[level];
             boolean found = false;
+            int i = -1;
             for (int colonLoc = levelMap.nextSetBit(start); colonLoc >= 0 && colonLoc < end; colonLoc = levelMap.nextSetBit(colonLoc + 1)) {
+                i++;
                 if (attributeNameMatches(colonLoc, part)) {
                     start = colonLoc;
                     int tempEnd = levelMap.nextSetBit(start + 1);
@@ -148,6 +177,7 @@ public class StructuralIndex {
                     }
                     level++;
                     found = true;
+                    pattern.add(i);
                     break;
                 }
             }
@@ -155,6 +185,10 @@ public class StructuralIndex {
                 return null;
             }
         }
+        return pattern;
+    }
+
+    private JsonValue readJsonValue(int start) {
         start = skipWhitespace(start+1);
         char c = sequence.charAt(start);
         switch (c) {

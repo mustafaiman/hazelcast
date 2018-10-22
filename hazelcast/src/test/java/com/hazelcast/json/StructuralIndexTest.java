@@ -18,6 +18,7 @@ package com.hazelcast.json;
 
 import com.hazelcast.internal.json.Json;
 import com.hazelcast.internal.json.JsonValue;
+import com.hazelcast.query.impl.predicates.ExperimentalJsonParser;
 import com.hazelcast.query.impl.predicates.StructuralIndex;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.annotation.ParallelTest;
@@ -47,17 +48,40 @@ public class StructuralIndexTest {
 
     @Test
     public void testSimpleJson_extractValue() {
+        ExperimentalJsonParser parser = new ExperimentalJsonParser();
         JsonValue value = Json.object().add("a1", "v1");
         String jsonString = value.toString();
         StructuralIndex index = new StructuralIndex(jsonString);
         System.out.println(jsonString);
         System.out.println(index);
-        System.out.println(index.findValueByPath("a1"));
-        assertEquals(Json.value("v1"), index.findValueByPath("a1"));
+        assertEquals(Json.value("v1"), parser.findValue(jsonString,"a1"));
+    }
+
+    @Test
+    public void testSimpleJson_extractValue_byPattern2() {
+        ExperimentalJsonParser parser = new ExperimentalJsonParser();
+        JsonValue value = Json.object().add("a1", "v1").add("a2", "v2");
+        String jsonString = value.toString();
+        StructuralIndex index = new StructuralIndex(jsonString);
+        System.out.println(jsonString);
+        System.out.println(index);
+        assertEquals(Json.value("v2"), parser.findValue(jsonString, "a2"));
+    }
+
+    @Test
+    public void testSimpleJson_extractValue_byPattern() {
+        ExperimentalJsonParser parser = new ExperimentalJsonParser();
+        JsonValue value = Json.object().add("a1", "v1");
+        String jsonString = value.toString();
+        StructuralIndex index = new StructuralIndex(jsonString);
+        System.out.println(jsonString);
+        System.out.println(index);
+        assertEquals(Json.value("v1"), parser.findValue(jsonString,"a1"));
     }
 
     @Test
     public void testNestedJson() {
+        ExperimentalJsonParser parser = new ExperimentalJsonParser();
         JsonValue value = Json.object()
                 .add("a1", "v1")
                 .add("a2", Json.object()
@@ -73,7 +97,71 @@ public class StructuralIndexTest {
         StructuralIndex index = new StructuralIndex(jsonString);
         System.out.println(index);
         System.out.println();
-        assertEquals(Json.value("uy"), index.findValueByPath("a3.c1.d2"));
+        assertEquals(Json.value("uy"), parser.findValue(jsonString, "a3.c1.d2"));
+        assertEquals(Json.value("uy"), parser.findValue(jsonString, "a3.c1.d2"));
+    }
+
+    @Test
+    public void testNestedJson_byPattern() {
+        ExperimentalJsonParser parser = new ExperimentalJsonParser();
+        JsonValue value = Json.object()
+                .add("a1", "v1")
+                .add("a2", Json.object()
+                        .add("b1", "v2")
+                        .add("b2", "v3"))
+                .add("a3", Json.object()
+                        .add("c1", Json.object()
+                                .add("d1", "v4")
+                                .add("d2", "uy")));
+
+        System.out.println(value.toString());
+        String jsonString = value.toString();
+        StructuralIndex index = new StructuralIndex(jsonString);
+        System.out.println(index);
+        System.out.println();
+        assertEquals(Json.value("uy"), parser.findValue(jsonString,"a3.c1.d2"));
+    }
+
+    @Test
+    public void testNestedJson_byPattern2() {
+        ExperimentalJsonParser parser = new ExperimentalJsonParser();
+        JsonValue value = Json.object()
+                .add("a1", "v1")
+                .add("a2", Json.object()
+                        .add("b1", "v2")
+                        .add("b2", "v3"))
+                .add("a3", Json.object()
+                        .add("c1", Json.object()
+                                .add("d1", "v4")
+                                .add("d2", "uy")));
+
+        System.out.println(value.toString());
+        String jsonString = value.toString();
+        StructuralIndex index = new StructuralIndex(jsonString);
+        System.out.println(index);
+        System.out.println();
+        assertEquals(Json.value("v4"), parser.findValue(jsonString,"a3.c1.d1"));
+    }
+
+    @Test
+    public void testNestedJson_byPattern3() {
+        ExperimentalJsonParser parser = new ExperimentalJsonParser();
+        JsonValue value = Json.object()
+                .add("a1", "v1")
+                .add("a2", Json.object()
+                        .add("b1", "v2")
+                        .add("b2", "v3"))
+                .add("a3", Json.object()
+                        .add("c1", Json.object()
+                                .add("d1", "v4")
+                                .add("d2", "uy")));
+
+        System.out.println(value.toString());
+        String jsonString = value.toString();
+        StructuralIndex index = new StructuralIndex(jsonString);
+        System.out.println(index);
+        System.out.println();
+        assertEquals(Json.value("v2"), parser.findValue(jsonString,"a2.b1"));
     }
 
     @Test
