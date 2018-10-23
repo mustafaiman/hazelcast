@@ -77,7 +77,7 @@ public class ExperimentalParserBenchmark {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public void experimentalParser(JsonState state, Blackhole blackhole) {
+    public void a_experimentalParser(JsonState state, Blackhole blackhole) {
         for (String jsonObject: state.jsonStrings) {
             JsonValue value = state.parser.findValue(jsonObject,"objectField.1");
             blackhole.consume(value);
@@ -86,7 +86,7 @@ public class ExperimentalParserBenchmark {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public void y_onlyIndexing_experimentalParser(JsonState state, Blackhole blackhole) {
+    public void a_a_onlyIndexing_experimentalParser(JsonState state, Blackhole blackhole) {
         for (String jsonObject: state.jsonStrings) {
             StructuralIndex index = new StructuralIndex(jsonObject);
             blackhole.consume(index);
@@ -99,6 +99,14 @@ public class ExperimentalParserBenchmark {
         } else {
             return "queryvalue";
         }
+    }
+
+    private static JsonObject createTinyJsonObject() {
+        return Json.object()
+                .add("objectField", Json.object()
+                        .add("1", 1)
+                        .add("2", 2)
+                        .add("3", 3));
     }
 
     private static JsonObject createJsonObject() {
@@ -129,10 +137,6 @@ public class ExperimentalParserBenchmark {
                 .add("longField", random.nextLong())
                 .add("intField", INT_BOUND)
                 .add("stringField", randomString())
-                .add("objectField", Json.object()
-                        .add("1", 1)
-                        .add("2", 2)
-                        .add("3", 3))
                 .add("doubleField", random.nextDouble())
                 .add("floatField", random.nextFloat())
                 .add("someLargeField", Json.object()
@@ -143,6 +147,10 @@ public class ExperimentalParserBenchmark {
                 .add("intField", INT_BOUND)
                 .add("stringField", randomString())
                 .add("objectField3", Json.object()
+                        .add("1", 1)
+                        .add("2", 2)
+                        .add("3", 3))
+                .add("objectField", Json.object()
                         .add("1", 1)
                         .add("2", 2)
                         .add("3", 3));

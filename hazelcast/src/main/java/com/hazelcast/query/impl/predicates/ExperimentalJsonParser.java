@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class ExperimentalJsonParser {
 
-    private Map<String, List<Integer>> patternMap = new HashMap<>();
+    private Map<String, List<Integer>> patternMap = new HashMap<String, List<Integer>>();
 
     public JsonValue findValue(String jsonString, String attributePath) {
         StructuralIndex index = new StructuralIndex(jsonString);

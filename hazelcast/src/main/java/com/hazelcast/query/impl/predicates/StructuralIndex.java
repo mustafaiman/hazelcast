@@ -18,39 +18,44 @@ package com.hazelcast.query.impl.predicates;
 
 import com.hazelcast.internal.json.Json;
 import com.hazelcast.internal.json.JsonValue;
+import org.apache.lucene.util.OpenBitSet;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Stack;
 
 public class StructuralIndex {
 
-    private BitSet colonIndex = new BitSet();
-    private BitSet leftBraceIndex = new BitSet();
-    private BitSet rightBraceIndex = new BitSet();
-    private BitSet quoteIndex = new BitSet();
-    private BitSet backslashIndex = new BitSet();
-    private BitSet[] levelIndex = new BitSet[5];
+    private OpenBitSet colonIndex;
+    private OpenBitSet leftBraceIndex;
+    private OpenBitSet rightBraceIndex;
+    private OpenBitSet quoteIndex;
+    private OpenBitSet backslashIndex;
+    private List<OpenBitSet> levelIndex = new ArrayList<OpenBitSet>(5);
     private CharSequence sequence;
 
     public StructuralIndex(String sequence) {
 
         this.sequence = sequence;
-        for (int i = 0; i < levelIndex.length; i++) {
-            levelIndex[i] = new BitSet();
-        }
-        createColonIndex(sequence);
-        createLeftBraceIndex(sequence);
-        createRightBraceIndex(sequence);
-        createQuoteIndex(sequence);
+        colonIndex = new OpenBitSet(sequence.length());
+        leftBraceIndex = new OpenBitSet(sequence.length());
+        rightBraceIndex = new OpenBitSet(sequence.length());
+        quoteIndex = new OpenBitSet(sequence.length());
+        backslashIndex = new OpenBitSet(sequence.length());
+
+//        createColonIndex(sequence);
+//        createLeftBraceIndex(sequence);
+//        createRightBraceIndex(sequence);
+//        createQuoteIndex(sequence);
+//        createBackslashIndex(sequence);
+        createIndexes(sequence);
         createLeveledIndex();
     }
 
     public String toString(int level) {
         StringBuilder builder = new StringBuilder();
-        for (int j = 0; j < levelIndex[level].length(); j++) {
-            builder.append(levelIndex[level].get(j) ? "+": "-");
+        for (int j = 0; j < getLevel(level).length(); j++) {
+            builder.append(getLevel(level).get(j) ? "+": "-");
         }
         builder.append('\t').append(level);
         return builder.toString();
@@ -59,7 +64,7 @@ public class StructuralIndex {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < levelIndex.length; i++) {
+        for (int i = 0; i < levelIndex.size(); i++) {
             builder.append(toString(i));
             builder.append('\n');
         }
@@ -73,15 +78,17 @@ public class StructuralIndex {
         System.out.println();
     }
 
-    private void createStructuralCharacterIndex(CharSequence text, char structuralChar, BitSet indexBitSet) {
+    private void createStructuralCharacterIndex(CharSequence text, char structuralChar, OpenBitSet indexBitSet) {
         for (int i = ((String)text).indexOf(structuralChar); i != -1; i = ((String)text).indexOf(structuralChar, i + 1)) {
-            indexBitSet.set(i);
+            indexBitSet.fastSet(i);
         }
     }
 
     private void createLeveledIndex() {
+        OpenBitSet inter = new OpenBitSet(colonIndex.length());
+        Stack<Integer> stack = new Stack<Integer>();
         for (int rPos = rightBraceIndex.nextSetBit(0); rPos >= 0; rPos = rightBraceIndex.nextSetBit(rPos+1)) {
-            Stack<Integer> stack = new Stack<Integer>();
+            stack.clear();
             for (int lPos = leftBraceIndex.nextSetBit(0); lPos >= 0; lPos = leftBraceIndex.nextSetBit(lPos+1)) {
                 if (lPos < rPos) {
                     stack.push(lPos);
@@ -90,14 +97,73 @@ public class StructuralIndex {
                 }
             }
             int lPos = stack.pop();
-            leftBraceIndex.clear(lPos);
+            leftBraceIndex.fastClear(lPos);
             int level = stack.size();
-            BitSet inter = new BitSet(colonIndex.length());
             inter.set(lPos, rPos + 1);
             inter.and(colonIndex);
             colonIndex.clear(lPos, rPos + 1);
-            levelIndex[level].or(inter);
+            getLevel(level).or(inter);
+            inter.clear(lPos, rPos + 1);
         }
+    }
+
+    private OpenBitSet getLevel(int level) {
+        if (level < levelIndex.size()) {
+            return levelIndex.get(level);
+        }
+        while (levelIndex.size() <= level) {
+            levelIndex.add(new OpenBitSet(sequence.length()));
+        }
+        return levelIndex.get(level);
+    }
+
+    private void createIndexes(CharSequence text) {
+        int x = 0;
+        for (int i = 0; i < colonIndex.getNumWords(); i++) {
+            long bits = 1;
+            for (int j = 0; j < 64 && x < text.length(); j++) {
+                char c = text.charAt(x);
+                switch (c) {
+                    case ':':
+                        colonIndex.getBits()[i] |= bits;
+                        break;
+                    case '"':
+                        quoteIndex.getBits()[i] |= bits;
+                        break;
+                    case '{':
+                        leftBraceIndex.getBits()[i] |= bits;
+                        break;
+                    case '}':
+                        rightBraceIndex.getBits()[i] |= bits;
+                        break;
+                    case '\\':
+                        backslashIndex.getBits()[i] |= bits;
+                        break;
+                }
+                x++;
+                bits <<= 1;
+            }
+        }
+//        for (int i = 0; i < text.length(); i++) {
+//            char c = text.charAt(i);
+//            switch (c) {
+//                case ':':
+//                    colonIndex.fastSet(i);
+//                    break;
+//                case '"':
+//                    quoteIndex.fastSet(i);
+//                    break;
+//                case '{':
+//                    leftBraceIndex.fastSet(i);
+//                    break;
+//                case '}':
+//                    rightBraceIndex.fastSet(i);
+//                    break;
+//                case '\\':
+//                    backslashIndex.fastSet(i);
+//                    break;
+//            }
+//        }
     }
 
     private void createColonIndex(CharSequence text) {
@@ -121,10 +187,10 @@ public class StructuralIndex {
     }
 
     private boolean attributeNameMatches(int colonLoc, String attributeName) {
-        int endQuote = quoteIndex.previousSetBit(colonLoc);
-        int startQuote = quoteIndex.previousSetBit(endQuote - 1);
+        int endQuote = quoteIndex.prevSetBit(colonLoc);
+        int startQuote = quoteIndex.prevSetBit(endQuote - 1);
         int index = 0;
-        for (int i = startQuote + 1; i < endQuote; i++) {
+        for (int i = startQuote + 1; i < endQuote && index < attributeName.length(); i++) {
             if (attributeName.charAt(index) != sequence.charAt(i)) {
                 return false;
             }
@@ -140,7 +206,7 @@ public class StructuralIndex {
         int level = 0;
         for (int i = 0; i < parts.length; i++) {
             String part = parts[i];
-            BitSet levelMap = levelIndex[level];
+            OpenBitSet levelMap = getLevel(level);
             for (int j = 0, colonLoc = levelMap.nextSetBit(start); j <= pattern.get(i) && colonLoc >= 0 && colonLoc < end; j++, colonLoc = levelMap.nextSetBit(colonLoc + 1)) {
                 start = colonLoc;
             }
@@ -159,12 +225,12 @@ public class StructuralIndex {
 
     public List<Integer> findPattern(String attributePath) {
         String[] parts = attributePath.split("\\.");
-        ArrayList<Integer> pattern = new ArrayList<>();
+        ArrayList<Integer> pattern = new ArrayList<Integer>();
         int start = 0;
         int end = sequence.length();
         int level = 0;
         for (String part: parts) {
-            BitSet levelMap = levelIndex[level];
+            OpenBitSet levelMap = getLevel(level);
             boolean found = false;
             int i = -1;
             for (int colonLoc = levelMap.nextSetBit(start); colonLoc >= 0 && colonLoc < end; colonLoc = levelMap.nextSetBit(colonLoc + 1)) {
