@@ -102,6 +102,26 @@ public class StructuralIndexTest {
     }
 
     @Test
+    public void testNestedJsonWithEscapedQuoute() {
+        ExperimentalJsonParser parser = new ExperimentalJsonParser();
+        JsonValue value = Json.object()
+                .add("a1", "v1")
+                .add("a2", Json.object()
+                        .add("b1", "v2")
+                        .add("b2", "v3"))
+                .add("a3", Json.object()
+                        .add("c1", Json.object()
+                                .add("d1", "v4")
+                                .add("d2", "u\"y")));
+
+        System.out.println(value.toString());
+        String jsonString = value.toString();
+        StructuralIndex index = new StructuralIndex(jsonString);
+        index.printQuoteIndex();
+        assertEquals(Json.value("u\"y"), parser.findValue(jsonString, "a3.c1.d2"));
+    }
+
+    @Test
     public void testNestedJson_byPattern() {
         ExperimentalJsonParser parser = new ExperimentalJsonParser();
         JsonValue value = Json.object()

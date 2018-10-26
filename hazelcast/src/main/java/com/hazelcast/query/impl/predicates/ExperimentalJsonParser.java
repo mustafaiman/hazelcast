@@ -43,4 +43,10 @@ public class ExperimentalJsonParser {
         return index.findValueByPattern(pattern, attributePath);
 
     }
+
+    public JsonValue findValueWithoutPattern(String jsonString, String attributePath) {
+        StructuralIndex index = new StructuralIndex(jsonString);
+        List<Integer> pattern = index.findPattern(attributePath);
+        return index.findValueByPattern(pattern, attributePath);
+    }
 }

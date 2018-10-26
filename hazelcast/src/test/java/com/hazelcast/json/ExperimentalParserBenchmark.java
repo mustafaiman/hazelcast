@@ -77,14 +77,23 @@ public class ExperimentalParserBenchmark {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public void a_experimentalParser(JsonState state, Blackhole blackhole) {
+    public void experimentalParser(JsonState state, Blackhole blackhole) {
         for (String jsonObject: state.jsonStrings) {
             JsonValue value = state.parser.findValue(jsonObject,"objectField.1");
             blackhole.consume(value);
         }
     }
 
-    @Benchmark
+//    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    public void a_experimentalParserWithoutPattern(JsonState state, Blackhole blackhole) {
+        for (String jsonObject: state.jsonStrings) {
+            JsonValue value = state.parser.findValueWithoutPattern(jsonObject,"objectField.1");
+            blackhole.consume(value);
+        }
+    }
+
+//    @Benchmark
     @BenchmarkMode(Mode.Throughput)
     public void a_a_onlyIndexing_experimentalParser(JsonState state, Blackhole blackhole) {
         for (String jsonObject: state.jsonStrings) {

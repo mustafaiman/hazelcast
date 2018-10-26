@@ -144,6 +144,15 @@ public class StructuralIndex {
                 bits <<= 1;
             }
         }
+        OpenBitSet shiftedBackslash = new OpenBitSet(sequence.length());
+        long remainder = 0;
+        for (int i = shiftedBackslash.getNumWords() - 1; i > 0; i--) {
+            shiftedBackslash.getBits()[i] = ~((backslashIndex.getBits()[i] << 1) | remainder);
+            remainder = shiftedBackslash.getBits()[i-1] & 0x8000;
+        }
+        shiftedBackslash.getBits()[0] = ~((backslashIndex.getBits()[0] << 1));
+
+        quoteIndex.intersect(shiftedBackslash);
 //        for (int i = 0; i < text.length(); i++) {
 //            char c = text.charAt(i);
 //            switch (c) {
@@ -189,15 +198,20 @@ public class StructuralIndex {
     private boolean attributeNameMatches(int colonLoc, String attributeName) {
         int endQuote = quoteIndex.prevSetBit(colonLoc);
         int startQuote = quoteIndex.prevSetBit(endQuote - 1);
-        int index = 0;
-        for (int i = startQuote + 1; i < endQuote && index < attributeName.length(); i++) {
-            if (attributeName.charAt(index) != sequence.charAt(i)) {
-                return false;
+        if (endQuote - startQuote - 1 == attributeName.length()) {
+            int index = 0;
+            for (int i = startQuote + 1; i < endQuote; i++) {
+                if (attributeName.charAt(index) != sequence.charAt(i)) {
+                    return false;
+                }
+                index++;
             }
-            index++;
+            return true;
+        } else {
+            return false;
         }
-        return index == attributeName.length();
     }
+
 
     public JsonValue findValueByPattern(List<Integer> pattern, String attributePath) {
         String[] parts = attributePath.split("\\.");
@@ -254,6 +268,13 @@ public class StructuralIndex {
         return pattern;
     }
 
+    public JsonValue doNothing() {
+        if (levelIndex.size() > 100000) {
+            throw new RuntimeException();
+        }
+        return Json.NULL;
+    }
+
     private JsonValue readJsonValue(int start) {
         start = skipWhitespace(start+1);
         char c = sequence.charAt(start);
@@ -263,7 +284,7 @@ public class StructuralIndex {
             case 'f':
                 return Json.FALSE;
             case '"':
-                return Json.value(readString(start + 1));
+                return Json.value(readString(start, quoteIndex.nextSetBit(start + 1)));
             case '-':
                 return Json.value(readNumber(start + 1, false));
             case '0':
@@ -283,12 +304,8 @@ public class StructuralIndex {
         }
     }
 
-    private String readString(int start) {
-        int end = start;
-        while (sequence.charAt(end) != '"') {
-            end++;
-        }
-        return sequence.subSequence(start, end).toString();
+    private String readString(int start, int end) {
+        return sequence.subSequence(start + 1, end).toString();
     }
 
     private Double readNumber(int start, boolean positive) {
