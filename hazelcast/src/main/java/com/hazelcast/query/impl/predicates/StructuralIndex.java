@@ -43,11 +43,6 @@ public class StructuralIndex {
         quoteIndex = new OpenBitSet(sequence.length());
         backslashIndex = new OpenBitSet(sequence.length());
 
-//        createColonIndex(sequence);
-//        createLeftBraceIndex(sequence);
-//        createRightBraceIndex(sequence);
-//        createQuoteIndex(sequence);
-//        createBackslashIndex(sequence);
         createIndexes(sequence);
         createLeveledIndex();
     }
@@ -76,12 +71,6 @@ public class StructuralIndex {
             System.out.print(quoteIndex.get(i) ? "+": "-");
         }
         System.out.println();
-    }
-
-    private void createStructuralCharacterIndex(CharSequence text, char structuralChar, OpenBitSet indexBitSet) {
-        for (int i = ((String)text).indexOf(structuralChar); i != -1; i = ((String)text).indexOf(structuralChar, i + 1)) {
-            indexBitSet.fastSet(i);
-        }
     }
 
     private void createLeveledIndex() {
@@ -173,26 +162,6 @@ public class StructuralIndex {
 //                    break;
 //            }
 //        }
-    }
-
-    private void createColonIndex(CharSequence text) {
-        createStructuralCharacterIndex(text, ':', colonIndex);
-    }
-
-    private void createLeftBraceIndex(CharSequence text) {
-        createStructuralCharacterIndex(text, '{', leftBraceIndex);
-    }
-
-    private void createRightBraceIndex(CharSequence text) {
-        createStructuralCharacterIndex(text, '}', rightBraceIndex);
-    }
-
-    private void createQuoteIndex(CharSequence text) {
-        createStructuralCharacterIndex(text, '"', quoteIndex);
-    }
-
-    private void createBackslashIndex(CharSequence text) {
-        createStructuralCharacterIndex(text, '\\', backslashIndex);
     }
 
     private boolean attributeNameMatches(int colonLoc, String attributeName) {

@@ -43,7 +43,7 @@ public class ExperimentalParserBenchmark {
 
     protected static final int K = 1000;
     protected static final int M = 1000000;
-    private static final int JSON_OBJECT_COUNT = 10 * K;
+    private static final int JSON_OBJECT_COUNT = 100 * K;
     private static final int INT_BOUND = M;
     private static final Random random = new Random();
 
@@ -84,18 +84,18 @@ public class ExperimentalParserBenchmark {
         }
     }
 
-//    @Benchmark
+    @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public void a_experimentalParserWithoutPattern(JsonState state, Blackhole blackhole) {
+    public void experimentalParserWithoutSpeculation(JsonState state, Blackhole blackhole) {
         for (String jsonObject: state.jsonStrings) {
             JsonValue value = state.parser.findValueWithoutPattern(jsonObject,"objectField.1");
             blackhole.consume(value);
         }
     }
 
-//    @Benchmark
+    @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public void a_a_onlyIndexing_experimentalParser(JsonState state, Blackhole blackhole) {
+    public void onlyCreateTokenIndexes(JsonState state, Blackhole blackhole) {
         for (String jsonObject: state.jsonStrings) {
             StructuralIndex index = new StructuralIndex(jsonObject);
             blackhole.consume(index);
