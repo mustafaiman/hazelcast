@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.hazelcast.json;
+package com.hazelcast.json.misonparser;
 
 import com.hazelcast.internal.json.Json;
 import com.hazelcast.internal.json.JsonObject;
 import com.hazelcast.internal.json.JsonValue;
-import com.hazelcast.query.impl.predicates.ExperimentalJsonParser;
-import com.hazelcast.query.impl.predicates.StructuralIndex;
+import com.hazelcast.query.misonparser.ByteBufferPool;
+import com.hazelcast.query.misonparser.ExperimentalJsonParser;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -52,6 +52,8 @@ public class ExperimentalParserBenchmark {
 
         public List<String> jsonStrings = new ArrayList<String>();
         public ExperimentalJsonParser parser = new ExperimentalJsonParser();
+        public ExperimentalJsonParser nativeParser = new ExperimentalJsonParser(true);
+        public ByteBufferPool genericAllocator = new ByteBufferPool();
 
         @Setup(Level.Trial)
         public void setup() {
@@ -84,23 +86,42 @@ public class ExperimentalParserBenchmark {
         }
     }
 
-    @Benchmark
-    @BenchmarkMode(Mode.Throughput)
-    public void experimentalParserWithoutSpeculation(JsonState state, Blackhole blackhole) {
-        for (String jsonObject: state.jsonStrings) {
-            JsonValue value = state.parser.findValueWithoutPattern(jsonObject,"objectField.1");
-            blackhole.consume(value);
-        }
-    }
-
-    @Benchmark
-    @BenchmarkMode(Mode.Throughput)
-    public void onlyCreateTokenIndexes(JsonState state, Blackhole blackhole) {
-        for (String jsonObject: state.jsonStrings) {
-            StructuralIndex index = new StructuralIndex(jsonObject);
-            blackhole.consume(index);
-        }
-    }
+//    @Benchmark
+//    @BenchmarkMode(Mode.Throughput)
+//    public void experimentalNativeParser(JsonState state, Blackhole blackhole) {
+//        for (String jsonObject: state.jsonStrings) {
+//            JsonValue value = state.nativeParser.findValue(jsonObject,"objectField.1");
+//            blackhole.consume(value);
+//        }
+//    }
+//
+//    @Benchmark
+//    @BenchmarkMode(Mode.Throughput)
+//    public void experimentalParserWithoutSpeculation(JsonState state, Blackhole blackhole) {
+//        for (String jsonObject: state.jsonStrings) {
+//            JsonValue value = state.parser.findValueWithoutPattern(jsonObject,"objectField.1");
+//            blackhole.consume(value);
+//        }
+//    }
+//
+//    @Benchmark
+//    @BenchmarkMode(Mode.Throughput)
+//    public void aa_onlyCreateTokenIndexesNative(JsonState state, Blackhole blackhole) {
+//        for (String jsonObject: state.jsonStrings) {
+//            StructuralIndex index = new NativeStructuralIndex(jsonObject, 5, state.genericAllocator);
+//            blackhole.consume(index);
+//            index.dispose();
+//        }
+//    }
+//
+//    @Benchmark
+//    @BenchmarkMode(Mode.Throughput)
+//    public void ab_onlyCreateTokenIndexes(JsonState state, Blackhole blackhole) {
+//        for (String jsonObject: state.jsonStrings) {
+//            StructuralIndex index = new StructuralIndex(jsonObject, null);
+//            blackhole.consume(index);
+//        }
+//    }
 
     private static String randomString() {
         if (random.nextInt(10) < 9) {
@@ -113,12 +134,12 @@ public class ExperimentalParserBenchmark {
     private static JsonObject createTinyJsonObject() {
         return Json.object()
                 .add("objectField", Json.object()
-                        .add("1", 1)
-                        .add("2", 2)
-                        .add("3", 3));
+                        .add("1", "a")
+                        .add("2", "b")
+                        .add("3", "c"));
     }
 
-    private static JsonObject createJsonObject() {
+    public static JsonObject createJsonObject() {
         return Json.object()
                 .add("doubleField", random.nextDouble())
                 .add("floatField", random.nextFloat())
@@ -130,9 +151,9 @@ public class ExperimentalParserBenchmark {
                 .add("intField", INT_BOUND)
                 .add("stringField", randomString())
                 .add("objectField", Json.object()
-                        .add("1", 1)
-                        .add("2", 2)
-                        .add("3", 3));
+                        .add("1", "a")
+                        .add("2", "b")
+                        .add("3", "c"));
     }
 
     private static JsonObject createHugeJsonObject() {
@@ -160,9 +181,9 @@ public class ExperimentalParserBenchmark {
                         .add("2", 2)
                         .add("3", 3))
                 .add("objectField", Json.object()
-                        .add("1", 1)
-                        .add("2", 2)
-                        .add("3", 3));
+                        .add("1", "a")
+                        .add("2", "b")
+                        .add("3", "c"));
     }
 
 

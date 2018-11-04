@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package com.hazelcast.query.impl.predicates;
+package com.hazelcast.query.misonparser;
 
-public class JsonEqualPredicate extends JsonEqualWithFilteringPredicate {
+import java.nio.ByteBuffer;
 
-    public JsonEqualPredicate() {
-        super();
+public class SIMDHelper {
+    static {
+        System.load("/Users/mustafaiman/hazelcast/hazelcast/src/main/resources/libSIMDHelper.jnilib");
     }
 
-    public JsonEqualPredicate(String attribute) {
-        super(attribute);
-    }
-
-    public JsonEqualPredicate(String attribute, Comparable value) {
-        super(attribute, value);
-    }
-
-    @Override
-    protected boolean filterOut(String jsonString) {
-        return false;
-    }
+    public static native void createCharacterIndexes(String text, int queryDepth, ByteBuffer leveledColonIndex);
 }

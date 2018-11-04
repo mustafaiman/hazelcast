@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.query.impl.predicates;
+package com.hazelcast.query.misonparser;
 
 import com.hazelcast.internal.json.JsonValue;
 
@@ -25,28 +25,47 @@ import java.util.Map;
 public class ExperimentalJsonParser {
 
     private Map<String, List<Integer>> patternMap = new HashMap<String, List<Integer>>();
+    private boolean isNative;
+    private ByteBufferPool allocator;
+
+    public ExperimentalJsonParser() {
+        this.isNative = false;
+    }
+
+    public ExperimentalJsonParser(boolean isNative) {
+        this.isNative = isNative;
+        this.allocator = new ByteBufferPool();
+    }
 
     public JsonValue findValue(String jsonString, String attributePath) {
-        StructuralIndex index = new StructuralIndex(jsonString);
+        String[] attributeParts = attributePath.split("\\.");
+        StructuralIndex index = StructuralIndex.createStructuralIndex(jsonString, attributeParts.length + 1, isNative, allocator);
         List<Integer> pattern = patternMap.get(attributePath);
         if (pattern != null) {
-            JsonValue speculatedValue = index.findValueByPattern(pattern, attributePath);
+            JsonValue speculatedValue = index.findValueByPattern(pattern, attributeParts);
             if (speculatedValue != null) {
+                index.dispose();
                 return speculatedValue;
             }
         }
-        pattern = index.findPattern(attributePath);
+        pattern = index.findPattern(attributeParts);
         if (pattern == null) {
+            index.dispose();
             return null;
         }
         patternMap.put(attributePath, pattern);
-        return index.findValueByPattern(pattern, attributePath);
+        JsonValue res = index.findValueByPattern(pattern, attributeParts);
+        index.dispose();
+        return res;
 
     }
 
     public JsonValue findValueWithoutPattern(String jsonString, String attributePath) {
-        StructuralIndex index = new StructuralIndex(jsonString);
-        List<Integer> pattern = index.findPattern(attributePath);
-        return index.findValueByPattern(pattern, attributePath);
+        String[] attributeParts = attributePath.split("\\.");
+        StructuralIndex index = StructuralIndex.createStructuralIndex(jsonString, attributeParts.length + 1, isNative, allocator);
+        List<Integer> pattern = index.findPattern(attributeParts);
+        JsonValue res = index.findValueByPattern(pattern, attributeParts);
+        index.dispose();
+        return res;
     }
 }

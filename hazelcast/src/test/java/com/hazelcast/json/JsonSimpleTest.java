@@ -21,42 +21,23 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.internal.json.Json;
 import com.hazelcast.internal.json.JsonObject;
 import com.hazelcast.query.Predicate;
-import com.hazelcast.query.impl.predicates.JsonEqualPredicate;
-import com.hazelcast.query.impl.predicates.JsonEqualWithFilteringPredicate;
-import com.hazelcast.query.impl.predicates.JsonGreaterLessPredicate;
-import com.hazelcast.query.impl.predicates.JsonGreaterLessWithFilteringPredicate;
-import com.hazelcast.test.HazelcastParallelParametersRunnerFactory;
+import com.hazelcast.query.impl.predicates.EqualPredicate;
+import com.hazelcast.query.impl.predicates.GreaterLessPredicate;
+import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
 import java.util.Collection;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 @Category({ParallelTest.class, QuickTest.class})
-@UseParametersRunnerFactory(HazelcastParallelParametersRunnerFactory.class)
-@RunWith(Parameterized.class)
+@RunWith(HazelcastParallelClassRunner.class)
 public class JsonSimpleTest extends HazelcastTestSupport {
-
-    @Parameters(name = "withFiltering:{0}")
-    public static Collection<Object> parameters() {
-        return asList(new Object[]{
-                true,
-                false
-        });
-    }
-
-    @Parameter
-    public boolean withFiltering;
 
     private JsonObject createJsonObjectForPerson(String name, boolean status) {
         return Json.object()
@@ -71,19 +52,11 @@ public class JsonSimpleTest extends HazelcastTestSupport {
     }
 
     private Predicate equalPredicate(String attributeName, Comparable value) {
-        if (withFiltering) {
-            return new JsonEqualWithFilteringPredicate(attributeName, value);
-        } else {
-            return new JsonEqualPredicate(attributeName, value);
-        }
+        return new EqualPredicate(attributeName, value);
     }
 
     private Predicate greaterLessPredicate(String attributeName, Comparable value, boolean equal, boolean less) {
-        if (withFiltering) {
-            return new JsonGreaterLessWithFilteringPredicate(attributeName, value, equal, less);
-        } else {
-            return new JsonGreaterLessPredicate(attributeName, value, equal, less);
-        }
+        return new GreaterLessPredicate(attributeName, value, equal, less);
     }
 
     @Test

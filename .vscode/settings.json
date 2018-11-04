@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "com_hazelcast_query_impl_simdhelper.h": "c",
+        "jni.h": "c"
+    }
+}

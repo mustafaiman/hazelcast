@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.hazelcast.query.impl.predicates;
+package com.hazelcast.query.misonparser;
 
-public class JsonGreaterLessPredicate extends JsonGreaterLessWithFilteringPredicate {
-    public JsonGreaterLessPredicate() {
-        super();
+public class BitOperations {
+
+    public static long extractFirstSetBit(long e) {
+        return e & (-e);
     }
 
-    public JsonGreaterLessPredicate(String attribute, Comparable value, boolean equal, boolean less) {
-        super(attribute, value, equal, less);
+    public static long removeFirstSetBit(long e) {
+        return e & (e-1);
     }
 
-    @Override
-    protected boolean filterOut(String jsonString) {
-        return false;
+    public static int countConsecutiveSetBits(long e) {
+        e++;
+        return Long.numberOfTrailingZeros(e);
     }
 }

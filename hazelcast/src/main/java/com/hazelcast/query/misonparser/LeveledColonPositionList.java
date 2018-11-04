@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package com.hazelcast.query.impl.predicates;
+package com.hazelcast.query.misonparser;
 
-import org.apache.lucene.util.OpenBitSet;
+import java.util.List;
 
-public class ModifiedOpenBitSet extends OpenBitSet {
-
-    @Override
-    public void set(long index) {
-        super.set(index);
-    }
+public interface LeveledColonPositionList {
+    List<Integer> getColons(int level, int start, int end);
 }

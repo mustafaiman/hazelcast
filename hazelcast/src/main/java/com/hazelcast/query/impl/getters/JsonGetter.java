@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2008-2018, Hazelcast, Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.hazelcast.query.impl.getters;
+
+import com.hazelcast.internal.json.JsonValue;
+import com.hazelcast.query.misonparser.ExperimentalJsonParser;
+public class JsonGetter extends Getter {
+
+    private static final ExperimentalJsonParser misonParser = new ExperimentalJsonParser();
+
+    public static final JsonGetter INSTANCE = new JsonGetter();
+
+    public JsonGetter() {
+        super(null);
+    }
+
+    public JsonGetter(Getter parent) {
+        super(parent);
+    }
+
+    @Override
+    Object getValue(Object obj) {
+        throw new RuntimeException("not implemented");
+    }
+
+    @Override
+    Object getValue(Object obj, String attributePath) {
+        return misonParser.findValue((String) obj, attributePath);
+    }
+
+    @Override
+    Class getReturnType() {
+        return JsonValue.class;
+    }
+
+    @Override
+    boolean isCacheable() {
+        return false;
+    }
+}

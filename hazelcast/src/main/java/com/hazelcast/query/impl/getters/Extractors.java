@@ -114,7 +114,9 @@ public final class Extractors {
             Object arguments = argumentsParser.parse(extractArgumentsFromAttributeName(attributeName));
             return new ExtractorGetter(serializationService, valueExtractor, arguments);
         } else {
-            if (targetObject instanceof Data) {
+            if (targetObject instanceof String) {
+                return JsonGetter.INSTANCE;
+            } else if (targetObject instanceof Data) {
                 if (genericPortableGetter == null) {
                     // will be initialised a couple of times in the worst case
                     genericPortableGetter = new PortableGetter(serializationService);
