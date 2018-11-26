@@ -47,8 +47,22 @@ public class StructuralIndex {
         createLeveledIndex();
     }
 
+    public StructuralIndex(String sequence, long[] array, int len) {
+        this.sequence = sequence;
+        this.maxNesting = array.length / len;
+        this.leveledIndex = new ArrayLeveledColonPositionsList(array, len);
+    }
+
     public void dispose() {
 
+    }
+
+    public String getSequence() {
+        return sequence;
+    }
+
+    public LeveledColonPositionList getLeveledIndex() {
+        return leveledIndex;
     }
 
     protected void fillIndexes(long[] colonIndex, long[] leftBraceIndex, long[] rightBraceIndex, long[] quoteIndex, long[] backslashIndex) {

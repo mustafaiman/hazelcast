@@ -20,4 +20,8 @@ import java.util.List;
 
 public interface LeveledColonPositionList {
     List<Integer> getColons(int level, int start, int end);
+
+    int getLengthInLongs();
+
+    long[] getIndexArray();
 }

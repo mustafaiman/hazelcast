@@ -13,41 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hazelcast.query.impl.getters;
 
-import com.hazelcast.internal.json.JsonValue;
-import com.hazelcast.query.misonparser.ExperimentalJsonParser;
-public class JsonGetter extends Getter {
+import com.hazelcast.query.misonparser.StructuralIndex;
 
-    protected static final ExperimentalJsonParser misonParser = new ExperimentalJsonParser();
+public class StructuralIndexGetter extends JsonGetter {
 
-    public static final JsonGetter INSTANCE = new JsonGetter();
-
-    public JsonGetter() {
-        super(null);
-    }
-
-    public JsonGetter(Getter parent) {
-        super(parent);
-    }
-
-    @Override
-    Object getValue(Object obj) {
-        throw new RuntimeException("not implemented");
-    }
-
+    public static final StructuralIndexGetter INSTANCE = new StructuralIndexGetter();
     @Override
     Object getValue(Object obj, String attributePath) {
-        return misonParser.findValue((String) obj, attributePath);
+        return misonParser.findValue((StructuralIndex) obj, attributePath);
     }
 
     @Override
     Class getReturnType() {
-        return JsonValue.class;
-    }
-
-    @Override
-    boolean isCacheable() {
-        return false;
+        return StructuralIndex.class;
     }
 }

@@ -21,6 +21,7 @@ import com.hazelcast.internal.json.JsonObject;
 import com.hazelcast.internal.json.JsonValue;
 import com.hazelcast.query.misonparser.ByteBufferPool;
 import com.hazelcast.query.misonparser.ExperimentalJsonParser;
+import com.hazelcast.query.misonparser.StructuralIndex;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -51,6 +52,7 @@ public class ExperimentalParserBenchmark {
     public static class JsonState {
 
         public List<String> jsonStrings = new ArrayList<String>();
+        public List<StructuralIndex> structuralIndices = new ArrayList<StructuralIndex>();
         public ExperimentalJsonParser parser = new ExperimentalJsonParser();
         public ExperimentalJsonParser nativeParser = new ExperimentalJsonParser(true);
         public ByteBufferPool genericAllocator = new ByteBufferPool();
@@ -58,7 +60,9 @@ public class ExperimentalParserBenchmark {
         @Setup(Level.Trial)
         public void setup() {
             for (int i = 0; i < JSON_OBJECT_COUNT; i++) {
-                jsonStrings.add(createJsonObject().toString());
+                String jsonString = createJsonObject().toString();
+                jsonStrings.add(jsonString);
+                structuralIndices.add(new StructuralIndex(jsonString, 5));
             }
         }
 
@@ -68,19 +72,28 @@ public class ExperimentalParserBenchmark {
         }
     }
 
-    @Benchmark
-    @BenchmarkMode(Mode.Throughput)
-    public void conventionalParser(JsonState state, Blackhole blackhole) {
-        for (String jsonObject: state.jsonStrings) {
-            JsonValue value = Json.parse(jsonObject).asObject().get("objectField").asObject().get("1");
-            blackhole.consume(value);
-        }
-    }
+//    @Benchmark
+//    @BenchmarkMode(Mode.Throughput)
+//    public void conventionalParser(JsonState state, Blackhole blackhole) {
+//        for (String jsonObject: state.jsonStrings) {
+//            JsonValue value = Json.parse(jsonObject).asObject().get("objectField").asObject().get("1");
+//            blackhole.consume(value);
+//        }
+//    }
+//
+//    @Benchmark
+//    @BenchmarkMode(Mode.Throughput)
+//    public void experimentalParser(JsonState state, Blackhole blackhole) {
+//        for (String jsonObject: state.jsonStrings) {
+//            JsonValue value = state.parser.findValue(jsonObject,"objectField.1");
+//            blackhole.consume(value);
+//        }
+//    }
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public void experimentalParser(JsonState state, Blackhole blackhole) {
-        for (String jsonObject: state.jsonStrings) {
+    public void experimentalParser_preIndexed(JsonState state, Blackhole blackhole) {
+        for (StructuralIndex jsonObject: state.structuralIndices) {
             JsonValue value = state.parser.findValue(jsonObject,"objectField.1");
             blackhole.consume(value);
         }

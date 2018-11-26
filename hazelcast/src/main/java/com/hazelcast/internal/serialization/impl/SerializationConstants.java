@@ -80,8 +80,10 @@ public final class SerializationConstants {
 
     public static final int JAVA_DEFAULT_TYPE_LINKED_LIST = -27;
 
+    public static final int JAVA_STRUCTURAL_INDEX = -28;
+
     // NUMBER OF CONSTANT SERIALIZERS...
-    public static final int CONSTANT_SERIALIZERS_LENGTH = 28;
+    public static final int CONSTANT_SERIALIZERS_LENGTH = 29;
 
     // ------------------------------------------------------------
     // JAVA SERIALIZATION

@@ -47,4 +47,14 @@ public class ArrayLeveledColonPositionsList implements LeveledColonPositionList 
         }
         return posList;
     }
+
+    @Override
+    public int getLengthInLongs() {
+        return len;
+    }
+
+    @Override
+    public long[] getIndexArray() {
+        return leveledColons;
+    }
 }

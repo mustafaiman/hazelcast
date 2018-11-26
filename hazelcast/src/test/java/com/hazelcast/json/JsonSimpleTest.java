@@ -23,8 +23,10 @@ import com.hazelcast.internal.json.JsonObject;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.impl.predicates.EqualPredicate;
 import com.hazelcast.query.impl.predicates.GreaterLessPredicate;
+import com.hazelcast.query.misonparser.StructuralIndex;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
+import com.hazelcast.test.TestHazelcastInstanceFactory;
 import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
 import org.junit.Test;
@@ -169,6 +171,35 @@ public class JsonSimpleTest extends HazelcastTestSupport {
 
         Collection<String> results = map.values(greaterLessPredicate("age", 31, true, false));
         assertEquals(0, results.size());
+    }
+
+    @Test
+    public void testStructuralIndexWriteRead() {
+        TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
+        HazelcastInstance instance = factory.newHazelcastInstance();
+        factory.newHazelcastInstance();
+
+        String json1 = createJsonObjectForPerson("mustafa", true, 26).toString();
+        String json2 = createJsonObjectForPerson("kamil", false, 30).toString();
+
+        StructuralIndex index1 = StructuralIndex.createStructuralIndex(json1, 5, false, null);
+        StructuralIndex index2 = StructuralIndex.createStructuralIndex(json2, 5, false, null);
+
+        IMap<Integer, StructuralIndex> map = instance.getMap(randomMapName());
+
+        for (int i = 0; i < 10000;i++) {
+            map.put(1, index1);
+            map.put(2, index2);
+            map.put(i, new StructuralIndex(Json.object().add("v", "v").toString(), 5));
+        }
+
+        Collection<StructuralIndex> results = map.values(greaterLessPredicate("age", 26, true, false));
+        assertEquals(2, results.size());
+
+        results = map.values(greaterLessPredicate("age", 27, true, false));
+        assertEquals(1, results.size());
+
+        factory.shutdownAll();
     }
 
 }

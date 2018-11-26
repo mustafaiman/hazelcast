@@ -58,6 +58,16 @@ public class BufferLeveledColonPositionList implements LeveledColonPositionList 
         return posList;
     }
 
+    @Override
+    public int getLengthInLongs() {
+        return len;
+    }
+
+    @Override
+    public long[] getIndexArray() {
+        return new long[0];
+    }
+
     public ByteBuffer getBuffer() {
         return leveledColons;
     }

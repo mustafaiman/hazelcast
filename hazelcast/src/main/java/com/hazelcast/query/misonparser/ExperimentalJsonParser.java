@@ -60,9 +60,41 @@ public class ExperimentalJsonParser {
 
     }
 
+    public JsonValue findValue(StructuralIndex index, String attributePath) {
+        String[] attributeParts = attributePath.split("\\.");
+        List<Integer> pattern = patternMap.get(attributePath);
+        if (pattern != null) {
+            JsonValue speculatedValue = index.findValueByPattern(pattern, attributeParts);
+            if (speculatedValue != null) {
+                index.dispose();
+                return speculatedValue;
+            }
+        }
+        pattern = index.findPattern(attributeParts);
+        if (pattern == null) {
+            index.dispose();
+            return null;
+        }
+        patternMap.put(attributePath, pattern);
+        JsonValue res = index.findValueByPattern(pattern, attributeParts);
+        index.dispose();
+        return res;
+
+    }
+
+
     public JsonValue findValueWithoutPattern(String jsonString, String attributePath) {
         String[] attributeParts = attributePath.split("\\.");
         StructuralIndex index = StructuralIndex.createStructuralIndex(jsonString, attributeParts.length + 1, isNative, allocator);
+        List<Integer> pattern = index.findPattern(attributeParts);
+        JsonValue res = index.findValueByPattern(pattern, attributeParts);
+        index.dispose();
+        return res;
+    }
+
+
+    public JsonValue findValueWithoutPattern(StructuralIndex index, String attributePath) {
+        String[] attributeParts = attributePath.split("\\.");
         List<Integer> pattern = index.findPattern(attributeParts);
         JsonValue res = index.findValueByPattern(pattern, attributeParts);
         index.dispose();

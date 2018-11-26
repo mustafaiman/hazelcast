@@ -23,6 +23,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.HazelcastSerializationException;
 import com.hazelcast.nio.serialization.StreamSerializer;
+import com.hazelcast.query.misonparser.StructuralIndex;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.Externalizable;
@@ -44,6 +45,7 @@ import static com.hazelcast.internal.serialization.impl.SerializationConstants.J
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_ENUM;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_EXTERNALIZABLE;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_SERIALIZABLE;
+import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_STRUCTURAL_INDEX;
 import static com.hazelcast.nio.IOUtil.newObjectInputStream;
 import static java.lang.Math.max;
 
@@ -225,6 +227,29 @@ public final class JavaDefaultSerializers {
             final byte[] bytes = obj.toByteArray();
             out.writeInt(bytes.length);
             out.write(bytes);
+        }
+    }
+
+    public static final class StructualIndexSerializer extends SingletonSerializer<StructuralIndex> {
+
+        @Override
+        public void write(ObjectDataOutput out, StructuralIndex object) throws IOException {
+            out.writeInt(object.getLeveledIndex().getLengthInLongs());
+            out.writeLongArray(object.getLeveledIndex().getIndexArray());
+            out.writeUTF(object.getSequence());
+        }
+
+        @Override
+        public StructuralIndex read(ObjectDataInput in) throws IOException {
+            int len = in.readInt();
+            long[] indexArray = in.readLongArray();
+            String seq = in.readUTF();
+            return new StructuralIndex(seq, indexArray, len);
+        }
+
+        @Override
+        public int getTypeId() {
+            return JAVA_STRUCTURAL_INDEX;
         }
     }
 

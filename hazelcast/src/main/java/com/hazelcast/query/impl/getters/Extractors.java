@@ -23,6 +23,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.query.QueryException;
 import com.hazelcast.query.extractor.ValueExtractor;
 import com.hazelcast.query.impl.DefaultArgumentParser;
+import com.hazelcast.query.misonparser.StructuralIndex;
 
 import java.util.Collections;
 import java.util.List;
@@ -114,7 +115,9 @@ public final class Extractors {
             Object arguments = argumentsParser.parse(extractArgumentsFromAttributeName(attributeName));
             return new ExtractorGetter(serializationService, valueExtractor, arguments);
         } else {
-            if (targetObject instanceof String) {
+            if (targetObject instanceof StructuralIndex) {
+                return StructuralIndexGetter.INSTANCE;
+            } else if (targetObject instanceof String) {
                 return JsonGetter.INSTANCE;
             } else if (targetObject instanceof Data) {
                 if (genericPortableGetter == null) {
