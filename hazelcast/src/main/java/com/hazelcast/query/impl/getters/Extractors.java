@@ -18,6 +18,7 @@ package com.hazelcast.query.impl.getters;
 
 import com.hazelcast.config.MapAttributeConfig;
 import com.hazelcast.internal.serialization.InternalSerializationService;
+import com.hazelcast.internal.serialization.impl.SerializationConstants;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.query.QueryException;
@@ -34,6 +35,22 @@ import static com.hazelcast.query.impl.getters.ExtractorHelper.extractAttributeN
 
 // one instance per MapContainer
 public final class Extractors {
+
+    public enum JsonParserType {
+        MISON,
+        JACKSON
+    }
+
+    public static final JsonParserType parserType;
+
+    static {
+        String jsonType = System.getProperty("json.parser.type");
+        if (JsonParserType.JACKSON.toString().equals(jsonType)) {
+            parserType = JsonParserType.JACKSON;
+        } else {
+            parserType = JsonParserType.MISON;
+        }
+    }
 
     private static final int MAX_CLASSES_IN_CACHE = 1000;
     private static final int MAX_GETTERS_PER_CLASS_IN_CACHE = 100;
@@ -87,6 +104,8 @@ public final class Extractors {
             targetData = (Data) target;
             if (targetData.isPortable()) {
                 return targetData;
+            } else if (parserType == JsonParserType.JACKSON && targetData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ) {
+                return targetData;
             } else {
                 // convert non-portable Data to object
                 return serializationService.toObject(target);
@@ -120,6 +139,9 @@ public final class Extractors {
             } else if (targetObject instanceof String) {
                 return JsonGetter.INSTANCE;
             } else if (targetObject instanceof Data) {
+                if (!((Data) targetObject).isPortable()) {
+                    return JacksonJsonGetter.INSTANCE;
+                }
                 if (genericPortableGetter == null) {
                     // will be initialised a couple of times in the worst case
                     genericPortableGetter = new PortableGetter(serializationService);

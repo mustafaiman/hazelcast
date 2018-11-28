@@ -57,4 +57,9 @@ public class ArrayLeveledColonPositionsList implements LeveledColonPositionList 
     public long[] getIndexArray() {
         return leveledColons;
     }
+
+    @Override
+    public void dispose() {
+
+    }
 }

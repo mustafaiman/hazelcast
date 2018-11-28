@@ -18,12 +18,14 @@ package com.hazelcast.json.misonparser;
 
 import com.hazelcast.internal.json.Json;
 import com.hazelcast.internal.json.JsonValue;
+import com.hazelcast.query.misonparser.NativeStructuralIndexFactory;
 import com.hazelcast.query.misonparser.SIMDHelper;
 import com.hazelcast.query.misonparser.ByteBufferPool;
 import com.hazelcast.query.misonparser.ExperimentalJsonParser;
 import com.hazelcast.query.misonparser.BufferLeveledColonPositionList;
 import com.hazelcast.query.misonparser.NativeStructuralIndex;
 import com.hazelcast.query.misonparser.StructuralIndex;
+import com.hazelcast.query.misonparser.StructuralIndexFactory;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
@@ -92,29 +94,6 @@ public class StructuralIndexTest {
                 .add("f", Json.object().add("t", "3"))
                 .add("f", Json.object().add("t", "3"))
                 .add("f", Json.object().add("t", "3"));
-//        value = Json.object()
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3)
-//                .add("a", 3);
         String text = value.toString();
         System.out.println(text.length());
         for (int i = 0; i < text.length();i++) {
@@ -143,7 +122,7 @@ public class StructuralIndexTest {
             System.out.println();
         }
         System.out.println("-------------");
-        BufferLeveledColonPositionList l = new BufferLeveledColonPositionList(buf, indexLength);
+        BufferLeveledColonPositionList l = new BufferLeveledColonPositionList(buf, indexLength, allocator);
 
         System.out.println(Arrays.toString(l.getColons(1, 1, 120).toArray()));
 
@@ -168,14 +147,14 @@ public class StructuralIndexTest {
                         .add("1", 1)
                         .add("2", 2)
                         .add("3", 3));
-        NativeStructuralIndex index = new NativeStructuralIndex(value.toString(), 2, new ByteBufferPool());
+        NativeStructuralIndex index = NativeStructuralIndexFactory.create(value.toString(), 2, new ByteBufferPool());
     }
 
     @Test
     public void testSimpleJson() {
         JsonValue value = Json.object().add("a1", "v1");
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 2);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 2);
         System.out.println(jsonString);
         System.out.println(index);
     }
@@ -194,7 +173,7 @@ public class StructuralIndexTest {
         ExperimentalJsonParser parser = new ExperimentalJsonParser();
         JsonValue value = Json.object().add("a1", "v1");
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 1);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 1);
         System.out.println(jsonString);
         System.out.println(index);
         assertEquals(Json.value("v1"), parser.findValue(jsonString,"a1"));
@@ -213,7 +192,7 @@ public class StructuralIndexTest {
         ExperimentalJsonParser parser = new ExperimentalJsonParser();
         JsonValue value = Json.object().add("a1", "v1").add("a2", "v2");
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 2);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 2);
         System.out.println(jsonString);
         System.out.println(index);
         assertEquals(Json.value("v2"), parser.findValue(jsonString, "a2"));
@@ -232,7 +211,7 @@ public class StructuralIndexTest {
         ExperimentalJsonParser parser = new ExperimentalJsonParser();
         JsonValue value = Json.object().add("a1", "v1");
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 2);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 2);
         System.out.println(jsonString);
         System.out.println(index);
         assertEquals(Json.value("v1"), parser.findValue(jsonString,"a1"));
@@ -280,7 +259,7 @@ public class StructuralIndexTest {
 
         System.out.println(value.toString());
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 4);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 4);
         System.out.println(index);
         System.out.println();
         assertEquals(Json.value("uy"), parser.findValue(jsonString, "a3.c1.d2"));
@@ -302,7 +281,7 @@ public class StructuralIndexTest {
 
         System.out.println(value.toString());
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 5);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 5);
         assertEquals(Json.value("u\"y"), parser.findValue(jsonString, "a3.c1.d2"));
     }
 
@@ -321,7 +300,7 @@ public class StructuralIndexTest {
 
         System.out.println(value.toString());
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 5);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 5);
         System.out.println(index);
         System.out.println();
         assertEquals(Json.value("uy"), parser.findValue(jsonString,"a3.c1.d2"));
@@ -342,7 +321,7 @@ public class StructuralIndexTest {
 
         System.out.println(value.toString());
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 5);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 5);
         System.out.println(index);
         System.out.println();
         assertEquals(Json.value("uy"), parser.findValue(jsonString,"a3.c1.d2"));
@@ -381,7 +360,7 @@ public class StructuralIndexTest {
 
         System.out.println(value.toString());
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 5);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 5);
         System.out.println(index);
         System.out.println();
         assertEquals(Json.value("v2"), parser.findValue(jsonString,"a2.b1"));
@@ -402,7 +381,7 @@ public class StructuralIndexTest {
 
         System.out.println(value.toString());
         String jsonString = value.toString();
-        StructuralIndex index = new StructuralIndex(jsonString, 5);
+        StructuralIndex index = StructuralIndexFactory.create(jsonString, 5);
         System.out.println(index);
         System.out.println();
         assertEquals(Json.value("v2"), parser.findValue(jsonString,"a2.b1"));

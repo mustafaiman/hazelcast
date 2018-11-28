@@ -22,6 +22,7 @@ import com.hazelcast.internal.json.JsonValue;
 import com.hazelcast.query.misonparser.ByteBufferPool;
 import com.hazelcast.query.misonparser.ExperimentalJsonParser;
 import com.hazelcast.query.misonparser.StructuralIndex;
+import com.hazelcast.query.misonparser.StructuralIndexFactory;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -62,7 +63,7 @@ public class ExperimentalParserBenchmark {
             for (int i = 0; i < JSON_OBJECT_COUNT; i++) {
                 String jsonString = createJsonObject().toString();
                 jsonStrings.add(jsonString);
-                structuralIndices.add(new StructuralIndex(jsonString, 5));
+                structuralIndices.add(StructuralIndexFactory.create(jsonString, 5));
             }
         }
 

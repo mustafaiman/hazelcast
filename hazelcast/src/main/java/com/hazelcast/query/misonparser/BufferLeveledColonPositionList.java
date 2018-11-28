@@ -25,17 +25,19 @@ public class BufferLeveledColonPositionList implements LeveledColonPositionList 
 
     private static final int WORD_LEN = 64;
 
+    private ByteBufferPool allocator;
     private ByteBuffer leveledColons;
     private int len;
     private ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
 
-    public BufferLeveledColonPositionList(ByteBuffer buffer, int lengthInLongs) {
+    public BufferLeveledColonPositionList(ByteBuffer buffer, int lengthInLongs, ByteBufferPool allocator) {
+        this.allocator = allocator;
         this.leveledColons = buffer;
         this.len = lengthInLongs;
     }
 
-    public BufferLeveledColonPositionList(ByteBuffer buffer, int lengthInLongs, ByteOrder byteOrder) {
-        this(buffer, lengthInLongs);
+    public BufferLeveledColonPositionList(ByteBuffer buffer, int lengthInLongs, ByteOrder byteOrder, ByteBufferPool allocator) {
+        this(buffer, lengthInLongs, allocator);
         this.byteOrder = byteOrder;
     }
 
@@ -70,5 +72,9 @@ public class BufferLeveledColonPositionList implements LeveledColonPositionList 
 
     public ByteBuffer getBuffer() {
         return leveledColons;
+    }
+
+    public void dispose() {
+        allocator.releaseBuffer(leveledColons);
     }
 }

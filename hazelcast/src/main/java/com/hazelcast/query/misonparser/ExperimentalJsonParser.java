@@ -39,23 +39,28 @@ public class ExperimentalJsonParser {
 
     public JsonValue findValue(String jsonString, String attributePath) {
         String[] attributeParts = attributePath.split("\\.");
-        StructuralIndex index = StructuralIndex.createStructuralIndex(jsonString, attributeParts.length + 1, isNative, allocator);
+        StructuralIndex index;
+        if (isNative) {
+            index = NativeStructuralIndexFactory.create(jsonString, attributeParts.length + 1, allocator);
+        } else {
+            index = StructuralIndexFactory.create(jsonString, attributeParts.length + 1);
+        }
         List<Integer> pattern = patternMap.get(attributePath);
         if (pattern != null) {
             JsonValue speculatedValue = index.findValueByPattern(pattern, attributeParts);
             if (speculatedValue != null) {
-                index.dispose();
+                index.getLeveledIndex().dispose();
                 return speculatedValue;
             }
         }
         pattern = index.findPattern(attributeParts);
         if (pattern == null) {
-            index.dispose();
+            index.getLeveledIndex().dispose();
             return null;
         }
         patternMap.put(attributePath, pattern);
         JsonValue res = index.findValueByPattern(pattern, attributeParts);
-        index.dispose();
+        index.getLeveledIndex().dispose();
         return res;
 
     }
@@ -66,18 +71,18 @@ public class ExperimentalJsonParser {
         if (pattern != null) {
             JsonValue speculatedValue = index.findValueByPattern(pattern, attributeParts);
             if (speculatedValue != null) {
-                index.dispose();
+                index.getLeveledIndex().dispose();
                 return speculatedValue;
             }
         }
         pattern = index.findPattern(attributeParts);
         if (pattern == null) {
-            index.dispose();
+            index.getLeveledIndex().dispose();
             return null;
         }
         patternMap.put(attributePath, pattern);
         JsonValue res = index.findValueByPattern(pattern, attributeParts);
-        index.dispose();
+        index.getLeveledIndex().dispose();
         return res;
 
     }
@@ -85,10 +90,15 @@ public class ExperimentalJsonParser {
 
     public JsonValue findValueWithoutPattern(String jsonString, String attributePath) {
         String[] attributeParts = attributePath.split("\\.");
-        StructuralIndex index = StructuralIndex.createStructuralIndex(jsonString, attributeParts.length + 1, isNative, allocator);
+        StructuralIndex index;
+        if (isNative) {
+            index = NativeStructuralIndexFactory.create(jsonString, attributeParts.length + 1, allocator);
+        } else {
+            index = StructuralIndexFactory.create(jsonString, attributeParts.length + 1);
+        }
         List<Integer> pattern = index.findPattern(attributeParts);
         JsonValue res = index.findValueByPattern(pattern, attributeParts);
-        index.dispose();
+        index.getLeveledIndex().dispose();
         return res;
     }
 
@@ -97,7 +107,7 @@ public class ExperimentalJsonParser {
         String[] attributeParts = attributePath.split("\\.");
         List<Integer> pattern = index.findPattern(attributeParts);
         JsonValue res = index.findValueByPattern(pattern, attributeParts);
-        index.dispose();
+        index.getLeveledIndex().dispose();
         return res;
     }
 }

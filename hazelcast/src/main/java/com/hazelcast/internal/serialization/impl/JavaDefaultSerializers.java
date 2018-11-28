@@ -230,21 +230,26 @@ public final class JavaDefaultSerializers {
         }
     }
 
-    public static final class StructualIndexSerializer extends SingletonSerializer<StructuralIndex> {
+    public static final class StructuralIndexSerializer extends SingletonSerializer<StructuralIndex> {
 
         @Override
         public void write(ObjectDataOutput out, StructuralIndex object) throws IOException {
             out.writeInt(object.getLeveledIndex().getLengthInLongs());
             out.writeLongArray(object.getLeveledIndex().getIndexArray());
-            out.writeUTF(object.getSequence());
+            out.writeInt(object.getSequence().length());
+            out.writeChars(object.getSequence());
         }
 
         @Override
         public StructuralIndex read(ObjectDataInput in) throws IOException {
             int len = in.readInt();
             long[] indexArray = in.readLongArray();
-            String seq = in.readUTF();
-            return new StructuralIndex(seq, indexArray, len);
+            int stringLength = in.readInt();
+            char[] chararray = new char[stringLength];
+            for (int i = 0; i < stringLength; i++) {
+                chararray[i] = in.readChar();
+            }
+            return new StructuralIndex(new String(chararray), indexArray, len);
         }
 
         @Override

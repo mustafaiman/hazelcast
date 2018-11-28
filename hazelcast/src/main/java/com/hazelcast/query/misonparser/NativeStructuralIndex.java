@@ -18,7 +18,6 @@ package com.hazelcast.query.misonparser;
 
 import com.hazelcast.internal.json.JsonValue;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,20 +25,10 @@ public class NativeStructuralIndex extends StructuralIndex {
 
     protected ByteBufferPool allocator;
 
-    public NativeStructuralIndex(String sequence, int maxNesting, ByteBufferPool allocator) {
+    public NativeStructuralIndex(String sequence, int maxNesting, BufferLeveledColonPositionList leveledIndex) {
         this.sequence = sequence;
-        this.allocator = allocator;
         this.maxNesting = maxNesting;
-        createLeveledIndex();
-    }
-
-    @Override
-    protected void createLeveledIndex() {
-        int indexLength = (((sequence.length() - 1)  >> 7) + 1) << 1;
-        ByteBuffer buf = allocator.allocateBuffer(indexLength * 7);
-        SIMDHelper.createCharacterIndexes(sequence, maxNesting, buf);
-
-        leveledIndex = new BufferLeveledColonPositionList(buf, indexLength);
+        this.leveledIndex = leveledIndex;
     }
 
     @Override
@@ -96,11 +85,6 @@ public class NativeStructuralIndex extends StructuralIndex {
             }
         }
         return pattern;
-    }
-
-    @Override
-    public void dispose() {
-        allocator.releaseBuffer(((BufferLeveledColonPositionList)leveledIndex).getBuffer());
     }
 
 }

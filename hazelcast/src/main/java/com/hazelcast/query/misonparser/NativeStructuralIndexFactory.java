@@ -16,14 +16,16 @@
 
 package com.hazelcast.query.misonparser;
 
-import java.util.List;
+import java.nio.ByteBuffer;
 
-public interface LeveledColonPositionList {
-    List<Integer> getColons(int level, int start, int end);
+public class NativeStructuralIndexFactory {
 
-    int getLengthInLongs();
+    public static NativeStructuralIndex create(String sequence, int maxNesting, ByteBufferPool allocator) {
+        int indexLength = (((sequence.length() - 1)  >> 7) + 1) << 1;
+        ByteBuffer buf = allocator.allocateBuffer(indexLength * 7);
+        SIMDHelper.createCharacterIndexes(sequence, maxNesting, buf);
 
-    long[] getIndexArray();
-
-    void dispose();
+        BufferLeveledColonPositionList leveledIndex = new BufferLeveledColonPositionList(buf, indexLength, allocator);
+        return new NativeStructuralIndex(sequence, maxNesting, leveledIndex);
+    }
 }

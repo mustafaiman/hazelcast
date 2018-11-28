@@ -17,6 +17,7 @@
 package com.hazelcast.query.impl;
 
 import com.hazelcast.internal.serialization.InternalSerializationService;
+import com.hazelcast.internal.serialization.impl.SerializationConstants;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.query.impl.getters.Extractors;
@@ -95,14 +96,14 @@ public class CachedQueryEntry<K, V> extends QueryableEntry<K, V> {
         Object targetObject;
         if (key) {
             // keyData is never null
-            if (keyData.isPortable()) {
+            if (keyData.isPortable()|| (Extractors.parserType == Extractors.JsonParserType.JACKSON && valueData.getType() == SerializationConstants.CONSTANT_TYPE_STRING)) {
                 targetObject = keyData;
             } else {
                 targetObject = getKey();
             }
         } else {
             if (valueObject == null) {
-                if (valueData.isPortable()) {
+                if (valueData.isPortable() || (Extractors.parserType == Extractors.JsonParserType.JACKSON && valueData.getType() == SerializationConstants.CONSTANT_TYPE_STRING)) {
                     targetObject = valueData;
                 } else {
                     targetObject = getValue();

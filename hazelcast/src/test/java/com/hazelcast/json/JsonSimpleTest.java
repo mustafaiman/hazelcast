@@ -24,6 +24,7 @@ import com.hazelcast.query.Predicate;
 import com.hazelcast.query.impl.predicates.EqualPredicate;
 import com.hazelcast.query.impl.predicates.GreaterLessPredicate;
 import com.hazelcast.query.misonparser.StructuralIndex;
+import com.hazelcast.query.misonparser.StructuralIndexFactory;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
@@ -182,15 +183,15 @@ public class JsonSimpleTest extends HazelcastTestSupport {
         String json1 = createJsonObjectForPerson("mustafa", true, 26).toString();
         String json2 = createJsonObjectForPerson("kamil", false, 30).toString();
 
-        StructuralIndex index1 = StructuralIndex.createStructuralIndex(json1, 5, false, null);
-        StructuralIndex index2 = StructuralIndex.createStructuralIndex(json2, 5, false, null);
+        StructuralIndex index1 = StructuralIndexFactory.create(json1, 5);
+        StructuralIndex index2 = StructuralIndexFactory.create(json2, 5);
 
         IMap<Integer, StructuralIndex> map = instance.getMap(randomMapName());
 
         for (int i = 0; i < 10000;i++) {
             map.put(1, index1);
             map.put(2, index2);
-            map.put(i, new StructuralIndex(Json.object().add("v", "v").toString(), 5));
+            map.put(i, StructuralIndexFactory.create(Json.object().add("v", "v").toString(), 5));
         }
 
         Collection<StructuralIndex> results = map.values(greaterLessPredicate("age", 26, true, false));
