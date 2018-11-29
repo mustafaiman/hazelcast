@@ -26,7 +26,6 @@ public class StructuralIndex {
 
     protected LeveledColonPositionList leveledIndex;
     protected String sequence;
-    protected int maxNesting;
 
     protected StructuralIndex() {
 
@@ -34,13 +33,11 @@ public class StructuralIndex {
 
     public StructuralIndex(String sequence, long[] array, int len) {
         this.sequence = sequence;
-        this.maxNesting = array.length / len;
         this.leveledIndex = new ArrayLeveledColonPositionsList(array, len);
     }
 
-    public StructuralIndex(String sequence, int maxNesting, ArrayLeveledColonPositionsList leveledIndex) {
+    public StructuralIndex(String sequence, ArrayLeveledColonPositionsList leveledIndex) {
         this.sequence = sequence;
-        this.maxNesting = maxNesting;
         this.leveledIndex = leveledIndex;
     }
 
@@ -53,16 +50,24 @@ public class StructuralIndex {
     }
 
 
+    protected char charAt(int index) {
+        return sequence.charAt(index);
+    }
+
+    protected int length() {
+        return sequence.length();
+    }
+
     protected boolean attributeNameMatches(int colonLoc, String attributeName) {
         colonLoc--;
-        while (Character.isWhitespace(sequence.charAt(colonLoc)))
+        while (Character.isWhitespace(charAt(colonLoc)))
             colonLoc--;
         int index = colonLoc - attributeName.length();
-        if (index < 1 || sequence.charAt(colonLoc) != '"' || sequence.charAt(index - 1) != '"') {
+        if (index < 1 || charAt(colonLoc) != '"' || charAt(index - 1) != '"') {
             return false;
         }
         for (int i = 0; i < attributeName.length(); i++) {
-            if (attributeName.charAt(i) != sequence.charAt(index)) {
+            if (attributeName.charAt(i) != charAt(index)) {
                 return false;
             }
             index++;
@@ -72,7 +77,7 @@ public class StructuralIndex {
 
     public JsonValue findValueByPattern(List<Integer> pattern, String[] parts) {
         int start = 0;
-        int end = sequence.length();
+        int end = length();
         int level = 1;
         int colonLoc = -1;
         for (int i = 0; i < parts.length; i++) {
@@ -99,7 +104,7 @@ public class StructuralIndex {
     public List<Integer> findPattern(String[] parts) {
         ArrayList<Integer> pattern = new ArrayList<Integer>(10);
         int start = 0;
-        int end = sequence.length();
+        int end = length();
         int level = 1;
         for (String part: parts) {
             List<Integer> colonLocations = leveledIndex.getColons(level, start, end);
@@ -126,7 +131,7 @@ public class StructuralIndex {
 
     protected JsonValue readJsonValue(int start) {
         start = skipWhitespace(start+1);
-        char c = sequence.charAt(start);
+        char c = charAt(start);
         switch (c) {
             case 't':
                 return Json.TRUE;
@@ -156,8 +161,8 @@ public class StructuralIndex {
     private String readString(int start) {
         StringBuilder builder = new StringBuilder();
         start++;
-        while (sequence.charAt(start) != '"') {
-            builder.append(sequence.charAt(start));
+        while (charAt(start) != '"') {
+            builder.append(charAt(start));
             start++;
         }
         return builder.toString();
@@ -165,20 +170,23 @@ public class StructuralIndex {
 
     private Double readNumber(int start, boolean positive) {
         int end = start;
-        while ((sequence.charAt(end) <= '9' && sequence.charAt(end) >= '0') || sequence.charAt(end) == '.') {
+        char c;
+        StringBuilder builder = new StringBuilder(7);
+        while (((c = charAt(end)) <= '9' && c >= '0') || c == '.') {
+            builder.append(c);
             end++;
         }
-        return Double.parseDouble(sequence.subSequence(start, end).toString());
+        return Double.parseDouble(builder.toString());
     }
 
     private int skipWhitespace(int start) {
-        while (start < sequence.length()) {
-            if (Character.isWhitespace(sequence.charAt(start))) {
+        while (start < length()) {
+            if (Character.isWhitespace(charAt(start))) {
                 start++;
             } else {
                 return start;
             }
         }
-        return sequence.length();
+        return length();
     }
 }

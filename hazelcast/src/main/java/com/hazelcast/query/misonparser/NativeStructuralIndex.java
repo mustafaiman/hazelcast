@@ -27,7 +27,6 @@ public class NativeStructuralIndex extends StructuralIndex {
 
     public NativeStructuralIndex(String sequence, int maxNesting, BufferLeveledColonPositionList leveledIndex) {
         this.sequence = sequence;
-        this.maxNesting = maxNesting;
         this.leveledIndex = leveledIndex;
     }
 

@@ -234,16 +234,16 @@ public final class JavaDefaultSerializers {
 
         @Override
         public void write(ObjectDataOutput out, StructuralIndex object) throws IOException {
-            out.writeInt(object.getLeveledIndex().getLengthInLongs());
             out.writeLongArray(object.getLeveledIndex().getIndexArray());
+            out.writeInt(object.getLeveledIndex().getLengthInLongs());
             out.writeInt(object.getSequence().length());
             out.writeChars(object.getSequence());
         }
 
         @Override
         public StructuralIndex read(ObjectDataInput in) throws IOException {
-            int len = in.readInt();
             long[] indexArray = in.readLongArray();
+            int len = in.readInt();
             int stringLength = in.readInt();
             char[] chararray = new char[stringLength];
             for (int i = 0; i < stringLength; i++) {

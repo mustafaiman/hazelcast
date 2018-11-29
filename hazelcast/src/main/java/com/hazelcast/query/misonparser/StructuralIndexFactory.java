@@ -47,7 +47,7 @@ public class StructuralIndexFactory {
         long[] coll = new long[indexLength * maxNesting];
         buildLeveledColonMap(coll, maxNesting, indexLength, colonIndex, leftBraceIndex, rightBraceIndex);
         ArrayLeveledColonPositionsList leveledIndex = new ArrayLeveledColonPositionsList(coll, indexLength);
-        return new StructuralIndex(sequence, maxNesting, leveledIndex);
+        return new StructuralIndex(sequence, leveledIndex);
     }
 
     protected static void fillIndexes(String sequence, long[] colonIndex, long[] leftBraceIndex, long[] rightBraceIndex, long[] quoteIndex, long[] backslashIndex) {

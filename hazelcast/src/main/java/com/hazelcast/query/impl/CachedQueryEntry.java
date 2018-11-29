@@ -96,14 +96,16 @@ public class CachedQueryEntry<K, V> extends QueryableEntry<K, V> {
         Object targetObject;
         if (key) {
             // keyData is never null
-            if (keyData.isPortable()|| (Extractors.parserType == Extractors.JsonParserType.JACKSON && valueData.getType() == SerializationConstants.CONSTANT_TYPE_STRING)) {
+            if (keyData.isPortable()|| valueData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ||
+                valueData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX) {
                 targetObject = keyData;
             } else {
                 targetObject = getKey();
             }
         } else {
             if (valueObject == null) {
-                if (valueData.isPortable() || (Extractors.parserType == Extractors.JsonParserType.JACKSON && valueData.getType() == SerializationConstants.CONSTANT_TYPE_STRING)) {
+                if (valueData.isPortable() || valueData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ||
+                        valueData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX) {
                     targetObject = valueData;
                 } else {
                     targetObject = getValue();

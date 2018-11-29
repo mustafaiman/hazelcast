@@ -57,6 +57,7 @@ public final class Extractors {
     private static final float EVICTION_PERCENTAGE = 0.2f;
 
     private volatile PortableGetter genericPortableGetter;
+    private volatile StructuralIndexGetter structuralIndexGetter;
 
     /**
      * Maps the extractorAttributeName WITHOUT the arguments to a ValueExtractor instance.
@@ -104,7 +105,8 @@ public final class Extractors {
             targetData = (Data) target;
             if (targetData.isPortable()) {
                 return targetData;
-            } else if (parserType == JsonParserType.JACKSON && targetData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ) {
+            } else if (targetData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ||
+                    targetData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX ) {
                 return targetData;
             } else {
                 // convert non-portable Data to object
@@ -135,11 +137,19 @@ public final class Extractors {
             return new ExtractorGetter(serializationService, valueExtractor, arguments);
         } else {
             if (targetObject instanceof StructuralIndex) {
-                return StructuralIndexGetter.INSTANCE;
+                if (structuralIndexGetter == null) {
+                    structuralIndexGetter = new StructuralIndexGetter(serializationService);
+                }
+                return structuralIndexGetter;
             } else if (targetObject instanceof String) {
                 return JsonGetter.INSTANCE;
             } else if (targetObject instanceof Data) {
-                if (!((Data) targetObject).isPortable()) {
+                if (((Data) targetObject).getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX) {
+                    if (structuralIndexGetter == null) {
+                        structuralIndexGetter = new StructuralIndexGetter(serializationService);
+                    }
+                    return structuralIndexGetter;
+                } else if (((Data) targetObject).getType() == SerializationConstants.CONSTANT_TYPE_STRING) {
                     return JacksonJsonGetter.INSTANCE;
                 }
                 if (genericPortableGetter == null) {

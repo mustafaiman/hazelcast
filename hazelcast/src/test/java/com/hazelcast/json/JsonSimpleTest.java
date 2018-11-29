@@ -188,11 +188,8 @@ public class JsonSimpleTest extends HazelcastTestSupport {
 
         IMap<Integer, StructuralIndex> map = instance.getMap(randomMapName());
 
-        for (int i = 0; i < 10000;i++) {
-            map.put(1, index1);
-            map.put(2, index2);
-            map.put(i, StructuralIndexFactory.create(Json.object().add("v", "v").toString(), 5));
-        }
+        map.put(1, index1);
+        map.put(2, index2);
 
         Collection<StructuralIndex> results = map.values(greaterLessPredicate("age", 26, true, false));
         assertEquals(2, results.size());
