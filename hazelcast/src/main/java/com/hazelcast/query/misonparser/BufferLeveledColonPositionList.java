@@ -77,4 +77,24 @@ public class BufferLeveledColonPositionList implements LeveledColonPositionList 
     public void dispose() {
         allocator.releaseBuffer(leveledColons);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BufferLeveledColonPositionList that = (BufferLeveledColonPositionList) o;
+
+        if (len != that.len) return false;
+        if (!leveledColons.equals(that.leveledColons)) return false;
+        return byteOrder.equals(that.byteOrder);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = leveledColons.hashCode();
+        result = 31 * result + len;
+        result = 31 * result + byteOrder.hashCode();
+        return result;
+    }
 }

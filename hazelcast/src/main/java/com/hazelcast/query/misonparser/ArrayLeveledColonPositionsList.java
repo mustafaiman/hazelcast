@@ -17,6 +17,7 @@
 package com.hazelcast.query.misonparser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ArrayLeveledColonPositionsList implements LeveledColonPositionList {
@@ -61,5 +62,23 @@ public class ArrayLeveledColonPositionsList implements LeveledColonPositionList 
     @Override
     public void dispose() {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ArrayLeveledColonPositionsList that = (ArrayLeveledColonPositionsList) o;
+
+        if (len != that.len) return false;
+        return Arrays.equals(leveledColons, that.leveledColons);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(leveledColons);
+        result = 31 * result + len;
+        return result;
     }
 }

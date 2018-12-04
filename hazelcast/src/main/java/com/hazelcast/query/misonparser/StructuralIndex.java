@@ -189,4 +189,22 @@ public class StructuralIndex {
         }
         return length();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StructuralIndex that = (StructuralIndex) o;
+
+        if (leveledIndex != null ? !leveledIndex.equals(that.leveledIndex) : that.leveledIndex != null) return false;
+        return sequence != null ? sequence.equals(that.sequence) : that.sequence == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = leveledIndex != null ? leveledIndex.hashCode() : 0;
+        result = 31 * result + (sequence != null ? sequence.hashCode() : 0);
+        return result;
+    }
 }
