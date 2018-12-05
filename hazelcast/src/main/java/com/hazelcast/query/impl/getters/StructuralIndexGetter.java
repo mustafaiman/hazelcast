@@ -20,7 +20,7 @@ import com.hazelcast.core.HazelcastException;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.nio.BufferObjectDataInput;
 import com.hazelcast.nio.serialization.Data;
-import com.hazelcast.query.misonparser.ArrayLeveledColonPositionsList;
+import com.hazelcast.query.misonparser.ByteArrayLeveledPositionList;
 import com.hazelcast.query.misonparser.DataStructuralIndex;
 import com.hazelcast.query.misonparser.ExperimentalJsonParser;
 import com.hazelcast.query.misonparser.StructuralIndex;
@@ -53,13 +53,14 @@ public class StructuralIndexGetter extends Getter {
 
             Data dataObject = (Data) obj;
             BufferObjectDataInput dataInput = serializationService.createObjectDataInput(dataObject);
-            long[] indexArray = dataInput.readLongArray();
-            int len = dataInput.readInt();
-            int stringlen = dataInput.readInt();
+            int stringLen = dataInput.readInt();
             int offset = dataInput.position();
+            dataInput.skipBytes(stringLen * 2);
+            int len = dataInput.readInt();
+            int longs = dataInput.readInt();
+            int pos = dataInput.position();
 
-            DataStructuralIndex dataStructuralIndex = new DataStructuralIndex(dataInput, offset, stringlen, new ArrayLeveledColonPositionsList(indexArray, len));
-
+            DataStructuralIndex dataStructuralIndex = new DataStructuralIndex(dataInput, offset, stringLen, new ByteArrayLeveledPositionList(dataInput, len, pos));
 
             return misonParser.findValue(dataStructuralIndex, attributePath);
         } catch (Exception e) {

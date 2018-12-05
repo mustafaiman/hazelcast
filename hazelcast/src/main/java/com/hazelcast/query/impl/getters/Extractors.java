@@ -103,10 +103,8 @@ public final class Extractors {
 
         if (target instanceof Data) {
             targetData = (Data) target;
-            if (targetData.isPortable()) {
-                return targetData;
-            } else if (targetData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ||
-                    targetData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX ) {
+            if (targetData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX ||
+                    targetData.getType() == SerializationConstants.CONSTANT_TYPE_STRING || targetData.isPortable()) {
                 return targetData;
             } else {
                 // convert non-portable Data to object

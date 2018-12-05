@@ -27,7 +27,7 @@ public class DataStructuralIndex extends StructuralIndex {
     private int stringLen;
 
 
-    public DataStructuralIndex(BufferObjectDataInput data, int offset, int stringLen, ArrayLeveledColonPositionsList leveledIndex) {
+    public DataStructuralIndex(BufferObjectDataInput data, int offset, int stringLen, LeveledColonPositionList leveledIndex) {
         this.data = data;
         this.offset = offset;
         this.leveledIndex = leveledIndex;

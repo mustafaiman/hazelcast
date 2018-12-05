@@ -20,7 +20,11 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.hazelcast.internal.json.Json;
 import com.hazelcast.internal.json.JsonObject;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.hazelcast.query.Predicate;
+import com.hazelcast.query.Predicates;
 import com.hazelcast.query.impl.predicates.EqualPredicate;
 import com.hazelcast.query.impl.predicates.GreaterLessPredicate;
 import com.hazelcast.query.misonparser.StructuralIndex;
@@ -33,6 +37,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
@@ -177,5 +182,51 @@ public class DataStructuralIndexSimpleTest extends HazelcastTestSupport {
 
         Collection<StructuralIndex> results = map.values(greaterLessPredicate("age", 31, true, false));
         assertEquals(0, results.size());
+    }
+
+    @Test
+    public void testPortableTemp() {
+        HazelcastInstance instance = createHazelcastInstance();
+        IMap<Integer, AgaogluMyPortable> map = instance.getMap("agaogluMyMap");
+        map.put(1, new AgaogluMyPortable(5));
+        Collection<AgaogluMyPortable> result = map.values(Predicates.greaterEqual("agaogluMyInt", 5));
+        assertEquals(1, result.size());
+    }
+
+    public class AgaogluMyPortable implements Portable {
+
+        private int agaoglyMyInt;
+
+        public AgaogluMyPortable(int agaoglyMyInt) {
+            this.agaoglyMyInt = agaoglyMyInt;
+        }
+
+        public int getAgaoglyMyInt() {
+            return agaoglyMyInt;
+        }
+
+        public void setAgaoglyMyInt(int agaoglyMyInt) {
+            this.agaoglyMyInt = agaoglyMyInt;
+        }
+
+        @Override
+        public int getFactoryId() {
+            return 1;
+        }
+
+        @Override
+        public int getClassId() {
+            return 1;
+        }
+
+        @Override
+        public void writePortable(PortableWriter writer) throws IOException {
+            writer.writeInt("agaogluMyInt", agaoglyMyInt);
+        }
+
+        @Override
+        public void readPortable(PortableReader reader) throws IOException {
+            this.agaoglyMyInt = reader.readInt("agaogluMyInt");
+        }
     }
 }
