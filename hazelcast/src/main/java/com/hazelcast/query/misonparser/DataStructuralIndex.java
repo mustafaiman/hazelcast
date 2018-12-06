@@ -41,7 +41,7 @@ public class DataStructuralIndex extends StructuralIndex {
             return c;
         } catch (IOException e) {
             e.printStackTrace();
-            return 0;
+            return (char)-1;
         }
     }
 

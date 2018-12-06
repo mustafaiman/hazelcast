@@ -130,8 +130,10 @@ public class StructuralIndex {
     }
 
     protected JsonValue readJsonValue(int start) {
-        start = skipWhitespace(start+1);
-        char c = charAt(start);
+        char c = charAt(++start); // start is on ":", it is important to skip it via pre++
+        while (c != -1 && Character.isWhitespace(c)) {
+            c = charAt(start++);
+        }
         switch (c) {
             case 't':
                 return Json.TRUE;
@@ -161,11 +163,16 @@ public class StructuralIndex {
     private String readString(int start) {
         StringBuilder builder = new StringBuilder();
         start++;
-        while (charAt(start) != '"') {
-            builder.append(charAt(start));
+        char c;
+        while (true) {
+            c = charAt(start);
             start++;
+            switch (c) {
+                case '"': return builder.toString();
+                default:
+                    builder.append(c);
+            }
         }
-        return builder.toString();
     }
 
     private Double readNumber(int start, boolean positive) {
@@ -177,17 +184,6 @@ public class StructuralIndex {
             end++;
         }
         return Double.parseDouble(builder.toString());
-    }
-
-    private int skipWhitespace(int start) {
-        while (start < length()) {
-            if (Character.isWhitespace(charAt(start))) {
-                start++;
-            } else {
-                return start;
-            }
-        }
-        return length();
     }
 
     @Override
