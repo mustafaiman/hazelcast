@@ -35,6 +35,7 @@ import com.hazelcast.nio.serialization.HazelcastSerializationException;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.query.json.AttributeIndex;
 import com.hazelcast.query.misonparser.StructuralIndex;
 
 import java.io.Externalizable;
@@ -178,6 +179,7 @@ public class SerializationServiceV1 extends AbstractSerializationService {
         registerConstant(ArrayList.class, new ArrayListStreamSerializer());
         registerConstant(LinkedList.class, new LinkedListStreamSerializer());
         registerConstant(StructuralIndex.class, new JavaDefaultSerializers.StructuralIndexSerializer());
+        registerConstant(AttributeIndex.class, new JavaDefaultSerializers.AttributeIndexSerializer());
 
         safeRegister(Serializable.class, javaSerializerAdapter);
         safeRegister(Externalizable.class, javaExternalizableAdapter);

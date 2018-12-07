@@ -82,8 +82,10 @@ public final class SerializationConstants {
 
     public static final int JAVA_STRUCTURAL_INDEX = -28;
 
+    public static final int JAVA_ATTRIBUTE_INDEX = -29;
+
     // NUMBER OF CONSTANT SERIALIZERS...
-    public static final int CONSTANT_SERIALIZERS_LENGTH = 29;
+    public static final int CONSTANT_SERIALIZERS_LENGTH = 30;
 
     // ------------------------------------------------------------
     // JAVA SERIALIZATION

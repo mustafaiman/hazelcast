@@ -16,13 +16,20 @@
 
 package com.hazelcast.internal.serialization.impl;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import com.hazelcast.nio.BufferObjectDataInput;
+import com.hazelcast.nio.BufferObjectDataOutput;
 import com.hazelcast.nio.ClassLoaderUtil;
 import com.hazelcast.nio.ClassNameFilter;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.HazelcastSerializationException;
 import com.hazelcast.nio.serialization.StreamSerializer;
+import com.hazelcast.query.json.AttributeIndex;
+import com.hazelcast.query.json.JsonSchemaCreator;
+import com.hazelcast.query.json.JsonSchemaNonLeafDescription;
+import com.hazelcast.query.json.JsonSchemaSerializer;
 import com.hazelcast.query.misonparser.StructuralIndex;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -34,10 +41,12 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_ATTRIBUTE_INDEX;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_BIG_DECIMAL;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_BIG_INTEGER;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_CLASS;
@@ -256,6 +265,41 @@ public final class JavaDefaultSerializers {
         @Override
         public int getTypeId() {
             return JAVA_STRUCTURAL_INDEX;
+        }
+    }
+
+    public static final class AttributeIndexSerializer extends SingletonSerializer<AttributeIndex> {
+
+        private static final JsonFactory factory = new JsonFactory();
+
+        @Override
+        public void write(ObjectDataOutput out, AttributeIndex object) throws IOException {
+            int metadataLocator = ((BufferObjectDataOutput)out).position();
+            out.writeInt(0);
+            String str = object.asString();
+            byte[] bytesForString = str.getBytes(Charset.forName("UTF8"));
+            int stringOffset = ((BufferObjectDataOutput) out).position() + 4;
+            out.writeByteArray(bytesForString);
+
+            JsonParser parser = factory.createParser(bytesForString, 0, bytesForString.length);
+
+            JsonSchemaNonLeafDescription description = JsonSchemaCreator.createDescription(parser);
+
+            int metadataLoc = ((BufferObjectDataOutput) out).position();
+            JsonSchemaSerializer.writeWithoutString((BufferObjectDataOutput) out, stringOffset, description);
+            ((BufferObjectDataOutput) out).writeInt(metadataLocator, metadataLoc);
+        }
+
+        @Override
+        public AttributeIndex read(ObjectDataInput in) throws IOException {
+            in.skipBytes(4);
+            byte[] bytes = in.readByteArray();
+            return AttributeIndex.create(new String(bytes));
+        }
+
+        @Override
+        public int getTypeId() {
+            return JAVA_ATTRIBUTE_INDEX;
         }
     }
 

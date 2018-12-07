@@ -82,6 +82,10 @@ public final class Json {
     return new JsonNumber(Integer.toString(value, 10));
   }
 
+  public static JsonValue valueAsNumber(String value) {
+    return new JsonNumber(value);
+  }
+
   /**
    * Returns a JsonValue instance that represents the given <code>long</code> value.
    *

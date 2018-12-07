@@ -36,28 +36,13 @@ import static com.hazelcast.query.impl.getters.ExtractorHelper.extractAttributeN
 // one instance per MapContainer
 public final class Extractors {
 
-    public enum JsonParserType {
-        MISON,
-        JACKSON
-    }
-
-    public static final JsonParserType parserType;
-
-    static {
-        String jsonType = System.getProperty("json.parser.type");
-        if (JsonParserType.JACKSON.toString().equals(jsonType)) {
-            parserType = JsonParserType.JACKSON;
-        } else {
-            parserType = JsonParserType.MISON;
-        }
-    }
-
     private static final int MAX_CLASSES_IN_CACHE = 1000;
     private static final int MAX_GETTERS_PER_CLASS_IN_CACHE = 100;
     private static final float EVICTION_PERCENTAGE = 0.2f;
 
     private volatile PortableGetter genericPortableGetter;
     private volatile StructuralIndexGetter structuralIndexGetter;
+    private volatile JsonSchemaDataGetter attributeIndexGetter;
 
     /**
      * Maps the extractorAttributeName WITHOUT the arguments to a ValueExtractor instance.
@@ -104,7 +89,9 @@ public final class Extractors {
         if (target instanceof Data) {
             targetData = (Data) target;
             if (targetData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX ||
-                    targetData.getType() == SerializationConstants.CONSTANT_TYPE_STRING || targetData.isPortable()) {
+                    targetData.getType() == SerializationConstants.JAVA_ATTRIBUTE_INDEX ||
+                    targetData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ||
+                    targetData.isPortable()) {
                 return targetData;
             } else {
                 // convert non-portable Data to object
@@ -134,15 +121,13 @@ public final class Extractors {
             Object arguments = argumentsParser.parse(extractArgumentsFromAttributeName(attributeName));
             return new ExtractorGetter(serializationService, valueExtractor, arguments);
         } else {
-            if (targetObject instanceof StructuralIndex) {
-                if (structuralIndexGetter == null) {
-                    structuralIndexGetter = new StructuralIndexGetter(serializationService);
-                }
-                return structuralIndexGetter;
-            } else if (targetObject instanceof String) {
-                return JsonGetter.INSTANCE;
-            } else if (targetObject instanceof Data) {
-                if (((Data) targetObject).getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX) {
+            if (targetObject instanceof Data) {
+                if (((Data) targetObject).getType() == SerializationConstants.JAVA_ATTRIBUTE_INDEX) {
+                    if (attributeIndexGetter == null) {
+                        attributeIndexGetter = new JsonSchemaDataGetter(serializationService);
+                    }
+                    return attributeIndexGetter;
+                } else if (((Data) targetObject).getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX) {
                     if (structuralIndexGetter == null) {
                         structuralIndexGetter = new StructuralIndexGetter(serializationService);
                     }
@@ -155,6 +140,13 @@ public final class Extractors {
                     genericPortableGetter = new PortableGetter(serializationService);
                 }
                 return genericPortableGetter;
+            } else if (targetObject instanceof StructuralIndex) {
+                if (structuralIndexGetter == null) {
+                    structuralIndexGetter = new StructuralIndexGetter(serializationService);
+                }
+                return structuralIndexGetter;
+            } else if (targetObject instanceof String) {
+                return JsonGetter.INSTANCE;
             } else {
                 return ReflectionHelper.createGetter(targetObject, attributeName);
             }
