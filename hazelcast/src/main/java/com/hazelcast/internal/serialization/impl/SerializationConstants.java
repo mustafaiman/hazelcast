@@ -84,8 +84,10 @@ public final class SerializationConstants {
 
     public static final int JAVA_ATTRIBUTE_INDEX = -29;
 
+    public static final int JAVA_JSONWITHMETADATA_INDEX = -30;
+
     // NUMBER OF CONSTANT SERIALIZERS...
-    public static final int CONSTANT_SERIALIZERS_LENGTH = 30;
+    public static final int CONSTANT_SERIALIZERS_LENGTH = 31;
 
     // ------------------------------------------------------------
     // JAVA SERIALIZATION

@@ -16,13 +16,25 @@
 
 package com.hazelcast.map.impl.record;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import com.hazelcast.config.CacheDeserializedValues;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.PartitioningStrategy;
+import com.hazelcast.internal.serialization.impl.SerializationConstants;
 import com.hazelcast.nio.serialization.Data;
+import com.hazelcast.query.json.JsonSchemaCreator;
+import com.hazelcast.query.json.JsonSchemaNonLeafDescription;
 import com.hazelcast.spi.serialization.SerializationService;
 
+import java.io.IOException;
+
+import static com.hazelcast.internal.serialization.impl.HeapData.DATA_OFFSET;
+
 public class DataRecordFactory implements RecordFactory<Data> {
+
+    JsonFactory jsonFactory = new JsonFactory();
 
     private final SerializationService serializationService;
     private final PartitioningStrategy partitionStrategy;
@@ -42,7 +54,7 @@ public class DataRecordFactory implements RecordFactory<Data> {
         assert value != null : "value can not be null";
 
         final Data data = serializationService.toData(value, partitionStrategy);
-        Record<Data> record;
+        AbstractRecord<Data> record;
         switch (cacheDeserializedValues) {
             case NEVER:
                 record = statisticsEnabled ? new DataRecordWithStats(data) : new DataRecord(data);
@@ -51,6 +63,15 @@ public class DataRecordFactory implements RecordFactory<Data> {
                 record = statisticsEnabled ? new CachedDataRecordWithStats(data) : new CachedDataRecord(data);
         }
 
+        if (data.getType() == SerializationConstants.JAVA_JSONWITHMETADATA_INDEX) {
+            try {
+                JsonParser parser = jsonFactory.createParser(data.toByteArray(), 4 + DATA_OFFSET, data.dataSize() - 4);
+                JsonSchemaNonLeafDescription description = JsonSchemaCreator.createDescription(parser);
+                record.setQueryingData(description);
+            } catch (IOException e) {
+                throw new HazelcastException(e);
+            }
+        }
         return record;
     }
 

@@ -40,6 +40,10 @@ abstract class Getter {
         return getValue(obj);
     }
 
+    Object getValue(Object obj, String attributePath, Object metadata) throws Exception {
+        return getValue(obj, attributePath);
+    }
+
     abstract Class getReturnType();
 
     abstract boolean isCacheable();

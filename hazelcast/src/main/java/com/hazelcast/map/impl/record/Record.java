@@ -17,6 +17,7 @@
 package com.hazelcast.map.impl.record;
 
 import com.hazelcast.nio.serialization.Data;
+import com.hazelcast.query.impl.QueryingMetadataHolder;
 
 /**
  * @param <V> the type of value which is in the Record
@@ -43,6 +44,10 @@ public interface Record<V> {
     void onUpdate(long now);
 
     void onStore();
+
+    QueryingMetadataHolder getQueryingData();
+
+    void setQueryingData(Object queryingData);
 
     /**
      * Returns heap cost of this record in bytes.

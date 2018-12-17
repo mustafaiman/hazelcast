@@ -17,6 +17,7 @@
 package com.hazelcast.map.impl.record;
 
 import com.hazelcast.nio.serialization.Data;
+import com.hazelcast.query.impl.QueryingMetadataHolder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static com.hazelcast.nio.Bits.INT_SIZE_IN_BYTES;
@@ -51,6 +52,7 @@ public abstract class AbstractRecord<V> implements Record<V> {
     protected long version;
     protected int ttl;
     protected int maxIdle;
+    protected QueryingMetadataHolder queryingData;
 
     @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT",
             justification = "Record can be accessed by only its own partition thread.")
@@ -60,6 +62,14 @@ public abstract class AbstractRecord<V> implements Record<V> {
     private int creationTime = NOT_AVAILABLE;
 
     AbstractRecord() {
+    }
+
+    public QueryingMetadataHolder getQueryingData() {
+        return queryingData;
+    }
+
+    public void setQueryingData(QueryingMetadataHolder queryingData) {
+        this.queryingData = queryingData;
     }
 
     @Override

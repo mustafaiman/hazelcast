@@ -30,6 +30,7 @@ import com.hazelcast.query.json.AttributeIndex;
 import com.hazelcast.query.json.JsonSchemaCreator;
 import com.hazelcast.query.json.JsonSchemaNonLeafDescription;
 import com.hazelcast.query.json.JsonSchemaSerializer;
+import com.hazelcast.query.json.JsonWithMetadata;
 import com.hazelcast.query.misonparser.StructuralIndex;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -54,6 +55,7 @@ import static com.hazelcast.internal.serialization.impl.SerializationConstants.J
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_ENUM;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_EXTERNALIZABLE;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_DEFAULT_TYPE_SERIALIZABLE;
+import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_JSONWITHMETADATA_INDEX;
 import static com.hazelcast.internal.serialization.impl.SerializationConstants.JAVA_STRUCTURAL_INDEX;
 import static com.hazelcast.nio.IOUtil.newObjectInputStream;
 import static java.lang.Math.max;
@@ -300,6 +302,24 @@ public final class JavaDefaultSerializers {
         @Override
         public int getTypeId() {
             return JAVA_ATTRIBUTE_INDEX;
+        }
+    }
+
+    public static final class JsonWithMetadataSerializer extends SingletonSerializer<JsonWithMetadata> {
+
+        @Override
+        public int getTypeId() {
+            return JAVA_JSONWITHMETADATA_INDEX;
+        }
+
+        @Override
+        public void write(ObjectDataOutput out, JsonWithMetadata object) throws IOException {
+            out.writeUTF(object.asString());
+        }
+
+        @Override
+        public JsonWithMetadata read(ObjectDataInput in) throws IOException {
+            return JsonWithMetadata.create(in.readUTF());
         }
     }
 

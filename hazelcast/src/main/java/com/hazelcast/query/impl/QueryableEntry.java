@@ -44,6 +44,7 @@ public abstract class QueryableEntry<K, V> implements Extractable, Map.Entry<K, 
 
     protected InternalSerializationService serializationService;
     protected Extractors extractors;
+    protected QueryingMetadataHolder queryingMetadataHolder;
 
     @Override
     public Object getAttributeValue(String attributeName) throws QueryException {
@@ -63,6 +64,14 @@ public abstract class QueryableEntry<K, V> implements Extractable, Map.Entry<K, 
 
     public abstract Data getValueData();
 
+    public QueryingMetadataHolder getQueryingMetadataHolder() {
+        return queryingMetadataHolder;
+    }
+
+    public void setQueryingMetadataHolder(QueryingMetadataHolder queryingMetadataHolder) {
+        this.queryingMetadataHolder = queryingMetadataHolder;
+    }
+
     protected abstract Object getTargetObject(boolean key);
 
     TypeConverter getConverter(String attributeName) {
@@ -81,7 +90,16 @@ public abstract class QueryableEntry<K, V> implements Extractable, Map.Entry<K, 
             boolean isKey = startsWithKeyConstant(attributeName);
             attributeName = getAttributeName(isKey, attributeName);
             Object target = getTargetObject(isKey);
-            result = extractAttributeValueFromTargetObject(extractors, serializationService, attributeName, target);
+            QueryingMetadataHolder metadata = getQueryingMetadataHolder();
+            Object queryingData = null;
+            if (metadata != null) {
+                if (isKey) {
+                    queryingData = queryingMetadataHolder.getKeyMetadata(target, extractors);
+                } else {
+                    queryingData = queryingMetadataHolder.getValueMetadata(target, extractors);
+                }
+            }
+            result = extractAttributeValueFromTargetObject(extractors, serializationService, attributeName, target, queryingData);
         }
         return result;
     }
@@ -104,13 +122,13 @@ public abstract class QueryableEntry<K, V> implements Extractable, Map.Entry<K, 
      * an instance of the QueryableEntry, but is in possession of key and value.
      */
     static Object extractAttributeValue(Extractors extractors, InternalSerializationService serializationService,
-                                        String attributeName, Data key, Object value) throws QueryException {
+                                        String attributeName, Data key, Object value, Object metadata) throws QueryException {
         Object result = extractAttributeValueIfAttributeQueryConstant(serializationService, attributeName, key, value);
         if (result == null) {
             boolean isKey = startsWithKeyConstant(attributeName);
             attributeName = getAttributeName(isKey, attributeName);
             Object target = isKey ? key : value;
-            result = extractAttributeValueFromTargetObject(extractors, serializationService, attributeName, target);
+            result = extractAttributeValueFromTargetObject(extractors, serializationService, attributeName, target, metadata);
         }
         return result;
     }
@@ -142,8 +160,8 @@ public abstract class QueryableEntry<K, V> implements Extractable, Map.Entry<K, 
 
     private static Object extractAttributeValueFromTargetObject(Extractors extractors,
                                                                 InternalSerializationService serializationService,
-                                                                String attributeName, Object target) {
-        return extractors.extract(serializationService, target, attributeName);
+                                                                String attributeName, Object target, Object queryingData) {
+        return extractors.extract(serializationService, target, attributeName, queryingData);
     }
 
     private AttributeType extractAttributeType(String attributeName) {

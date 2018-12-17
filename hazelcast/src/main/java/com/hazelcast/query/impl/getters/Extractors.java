@@ -61,12 +61,12 @@ public final class Extractors {
         this.argumentsParser = new DefaultArgumentParser();
     }
 
-    public Object extract(InternalSerializationService serializationService, Object target, String attributeName) {
+    public Object extract(InternalSerializationService serializationService, Object target, String attributeName, Object queryingData) {
         Object targetObject = getTargetObject(serializationService, target);
         if (targetObject != null) {
             Getter getter = getGetter(serializationService, targetObject, attributeName);
             try {
-                return getter.getValue(targetObject, attributeName);
+                return getter.getValue(targetObject, attributeName, queryingData);
             } catch (Exception ex) {
                 throw new QueryException(ex);
             }
@@ -91,6 +91,7 @@ public final class Extractors {
             if (targetData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX ||
                     targetData.getType() == SerializationConstants.JAVA_ATTRIBUTE_INDEX ||
                     targetData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ||
+                    targetData.getType() == SerializationConstants.JAVA_JSONWITHMETADATA_INDEX ||
                     targetData.isPortable()) {
                 return targetData;
             } else {
@@ -122,7 +123,8 @@ public final class Extractors {
             return new ExtractorGetter(serializationService, valueExtractor, arguments);
         } else {
             if (targetObject instanceof Data) {
-                if (((Data) targetObject).getType() == SerializationConstants.JAVA_ATTRIBUTE_INDEX) {
+                if (((Data) targetObject).getType() == SerializationConstants.JAVA_ATTRIBUTE_INDEX ||
+                    ((Data) targetObject).getType() == SerializationConstants.JAVA_JSONWITHMETADATA_INDEX) {
                     if (attributeIndexGetter == null) {
                         attributeIndexGetter = new JsonSchemaDataGetter(serializationService);
                     }

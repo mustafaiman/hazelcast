@@ -34,6 +34,7 @@ import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.impl.QueryableEntriesSegment;
 import com.hazelcast.query.impl.QueryableEntry;
+import com.hazelcast.query.impl.QueryingMetadataHolder;
 import com.hazelcast.query.impl.getters.Extractors;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.OperationService;
@@ -89,11 +90,13 @@ public class PartitionScanRunner {
             Data key = (Data) toData(record.getKey());
             Object value = toData(
                     useCachedValues ? Records.getValueOrCachedValue(record, serializationService) : record.getValue());
+            QueryingMetadataHolder queryingMetadata = record.getQueryingData();
             if (value == null) {
                 continue;
             }
 
             queryEntry.init(serializationService, key, value, extractors);
+            queryEntry.setQueryingMetadataHolder(queryingMetadata);
             if (predicate.apply(queryEntry) && compareAnchor(pagingPredicate, queryEntry, nearestAnchorEntry)) {
                 result.add(queryEntry);
 

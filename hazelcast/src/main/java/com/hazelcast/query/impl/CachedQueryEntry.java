@@ -99,7 +99,8 @@ public class CachedQueryEntry<K, V> extends QueryableEntry<K, V> {
             if (keyData.isPortable() ||
                     valueData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ||
                     valueData.getType() == SerializationConstants.JAVA_ATTRIBUTE_INDEX ||
-                    valueData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX ) {
+                    valueData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX  ||
+                    valueData.getType() == SerializationConstants.JAVA_JSONWITHMETADATA_INDEX ) {
                 targetObject = keyData;
             } else {
                 targetObject = getKey();
@@ -109,7 +110,8 @@ public class CachedQueryEntry<K, V> extends QueryableEntry<K, V> {
                 if (valueData.isPortable() ||
                         valueData.getType() == SerializationConstants.CONSTANT_TYPE_STRING ||
                         valueData.getType() == SerializationConstants.JAVA_ATTRIBUTE_INDEX ||
-                        valueData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX) {
+                        valueData.getType() == SerializationConstants.JAVA_STRUCTURAL_INDEX ||
+                        valueData.getType() == SerializationConstants.JAVA_JSONWITHMETADATA_INDEX) {
                     targetObject = valueData;
                 } else {
                     targetObject = getValue();

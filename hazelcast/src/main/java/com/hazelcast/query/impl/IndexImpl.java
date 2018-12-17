@@ -79,12 +79,12 @@ public class IndexImpl implements InternalIndex {
             converter = entry.getConverter(attributeName);
         }
 
-        Object newAttributeValue = extractAttributeValue(entry.getKeyData(), entry.getTargetObject(false));
+        Object newAttributeValue = extractAttributeValue(entry.getKeyData(), entry.getTargetObject(false), entry.getQueryingMetadataHolder());
         if (oldRecordValue == null) {
             indexStore.newIndex(newAttributeValue, entry, operationStats);
             stats.onInsert(timestamp, operationStats, operationSource);
         } else {
-            Object oldAttributeValue = extractAttributeValue(entry.getKeyData(), oldRecordValue);
+            Object oldAttributeValue = extractAttributeValue(entry.getKeyData(), oldRecordValue, entry.getQueryingMetadataHolder());
             indexStore.updateIndex(oldAttributeValue, newAttributeValue, entry, operationStats);
             stats.onUpdate(timestamp, operationStats, operationSource);
         }
@@ -95,13 +95,13 @@ public class IndexImpl implements InternalIndex {
         long timestamp = stats.makeTimestamp();
         IndexOperationStats operationStats = stats.createOperationStats();
 
-        Object attributeValue = extractAttributeValue(key, value);
+        Object attributeValue = extractAttributeValue(key, value, null);
         indexStore.removeIndex(attributeValue, key, operationStats);
         stats.onRemove(timestamp, operationStats, operationSource);
     }
 
-    private Object extractAttributeValue(Data key, Object value) {
-        return QueryableEntry.extractAttributeValue(extractors, ss, attributeName, key, value);
+    private Object extractAttributeValue(Data key, Object value, Object metadata) {
+        return QueryableEntry.extractAttributeValue(extractors, ss, attributeName, key, value, metadata);
     }
 
     @Override
