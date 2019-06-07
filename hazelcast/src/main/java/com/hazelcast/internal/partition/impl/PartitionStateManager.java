@@ -17,10 +17,11 @@
 package com.hazelcast.internal.partition.impl;
 
 import com.hazelcast.cluster.ClusterState;
-import com.hazelcast.cluster.memberselector.MemberSelectors;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.cluster.MemberSelector;
+import com.hazelcast.cluster.memberselector.MemberSelectors;
+import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastInternalException;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.instance.impl.NodeExtension;
 import com.hazelcast.internal.cluster.ClusterService;
@@ -138,7 +139,7 @@ public class PartitionStateManager {
         logger.info("Initializing cluster partition table arrangement...");
         PartitionReplica[][] newState = partitionStateGenerator.arrange(memberGroups, partitions);
         if (newState.length != partitionCount) {
-            throw new HazelcastException("Invalid partition count! "
+            throw new HazelcastInternalException("Invalid partition count! "
                     + "Expected: " + partitionCount + ", Actual: " + newState.length);
         }
 

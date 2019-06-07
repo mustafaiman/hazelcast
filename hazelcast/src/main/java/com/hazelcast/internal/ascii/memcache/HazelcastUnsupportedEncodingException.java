@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package com.hazelcast.query;
+package com.hazelcast.internal.ascii.memcache;
 
 import com.hazelcast.core.HazelcastException;
 
-/**
- * Exception class for the Query.
- */
-public class QueryException extends HazelcastException {
+public class HazelcastUnsupportedEncodingException extends HazelcastException {
 
-    public QueryException(String message) {
-        super(message);
-    }
-
-    public QueryException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public QueryException(Throwable cause) {
+    public HazelcastUnsupportedEncodingException(Throwable cause) {
         super(cause);
     }
 }

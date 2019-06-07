@@ -16,7 +16,6 @@
 
 package com.hazelcast.internal.partition.operation;
 
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.internal.partition.MigrationInfo;
 import com.hazelcast.internal.partition.ReplicaFragmentMigrationState;
 import com.hazelcast.internal.partition.impl.InternalPartitionServiceImpl;
@@ -56,7 +55,7 @@ import static com.hazelcast.spi.impl.operationexecutor.OperationRunner.runDirect
 public class MigrationOperation extends BaseMigrationOperation implements TargetAware {
 
     private static final OperationResponseHandler ERROR_RESPONSE_HANDLER = (op, obj) -> {
-        throw new HazelcastException("Migration operations can not send response!");
+        throw new UnsupportedOperationException("Migration operations can not send response!");
     };
 
     private ReplicaFragmentMigrationState fragmentMigrationState;

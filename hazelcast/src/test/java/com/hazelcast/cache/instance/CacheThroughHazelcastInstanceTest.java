@@ -28,6 +28,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
+import com.hazelcast.core.HazelcastInternalException;
 import com.hazelcast.core.ICacheManager;
 import com.hazelcast.map.IMap;
 import com.hazelcast.instance.HazelcastInstanceCacheManager;
@@ -384,7 +385,7 @@ public class CacheThroughHazelcastInstanceTest extends HazelcastTestSupport {
         // when one attempts to getCache but a HazelcastException other than ServiceNotFoundException is thrown
         HazelcastInstanceImpl hzInstanceImpl = mock(HazelcastInstanceImpl.class);
         when(hzInstanceImpl.getDistributedObject(anyString(), anyString()))
-                .thenThrow(new HazelcastException("mock hz exception"));
+                .thenThrow(new HazelcastInternalException("mock hz exception"));
 
         // then the thrown HazelcastException is rethrown by getCache
         ICacheManager hzCacheManager = new HazelcastInstanceCacheManager(hzInstanceImpl);

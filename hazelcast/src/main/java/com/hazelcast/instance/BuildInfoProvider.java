@@ -16,7 +16,7 @@
 
 package com.hazelcast.instance;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastInternalException;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 
@@ -138,10 +138,8 @@ public final class BuildInfoProvider {
         try {
             Field field = clazz.getField(fieldName);
             return (String) field.get(null);
-        } catch (NoSuchFieldException e) {
-            throw new HazelcastException(e);
-        } catch (IllegalAccessException e) {
-            throw new HazelcastException(e);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new HazelcastInternalException(e);
         }
     }
 

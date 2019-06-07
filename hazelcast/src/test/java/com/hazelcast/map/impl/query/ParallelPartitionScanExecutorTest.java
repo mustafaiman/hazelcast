@@ -39,6 +39,7 @@ import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import static com.hazelcast.test.HazelcastTestSupport.randomString;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -87,7 +88,7 @@ public class ParallelPartitionScanExecutorTest {
         Predicate predicate = Predicates.equal("attribute", 1);
         QueryResult queryResult = new QueryResult(IterationType.ENTRY, null, null, Long.MAX_VALUE, false);
 
-        doThrow(new QueryException()).when(runner).run(anyString(), eq(predicate), anyInt(), isA(QueryResult.class));
+        doThrow(new QueryException(randomString())).when(runner).run(anyString(), eq(predicate), anyInt(), isA(QueryResult.class));
 
         expected.expect(QueryException.class);
         executor.execute("Map", predicate, asList(1, 2, 3), queryResult);

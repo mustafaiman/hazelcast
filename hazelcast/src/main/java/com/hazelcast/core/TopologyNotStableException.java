@@ -14,24 +14,10 @@
  * limitations under the License.
  */
 
-package com.hazelcast.query;
+package com.hazelcast.core;
 
-import com.hazelcast.core.HazelcastException;
-
-/**
- * Exception class for the Query.
- */
-public class QueryException extends HazelcastException {
-
-    public QueryException(String message) {
+public class TopologyNotStableException extends HazelcastException {
+    public TopologyNotStableException(String message) {
         super(message);
-    }
-
-    public QueryException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public QueryException(Throwable cause) {
-        super(cause);
     }
 }

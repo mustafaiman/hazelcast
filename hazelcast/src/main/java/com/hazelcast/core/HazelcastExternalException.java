@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package com.hazelcast.query;
-
-import com.hazelcast.core.HazelcastException;
+package com.hazelcast.core;
 
 /**
- * Exception class for the Query.
+ * This exception is thrown when Hazelcast operations encounter problems
+ * while interacting external systems such as file systems, custom code,
+ * etc. .
  */
-public class QueryException extends HazelcastException {
+public class HazelcastExternalException extends HazelcastException {
+    public HazelcastExternalException(Throwable cause) {
+        super(cause);
+    }
 
-    public QueryException(String message) {
+    public HazelcastExternalException(String message) {
         super(message);
     }
 
-    public QueryException(String message, Throwable cause) {
+    public HazelcastExternalException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public QueryException(Throwable cause) {
-        super(cause);
     }
 }

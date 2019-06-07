@@ -127,7 +127,7 @@ public final class DeclarativeConfigUtil {
 
         String message = String.format("The suffix of the resource \'%s\' referenced in \'%s\' is not in the list of accepted "
                 + "suffixes: \'%s\'", configResource, propertyKey, Arrays.toString(acceptedSuffixes.toArray()));
-        throw new HazelcastException(message);
+        throw new InvalidConfigurationException(message);
     }
 
     /**

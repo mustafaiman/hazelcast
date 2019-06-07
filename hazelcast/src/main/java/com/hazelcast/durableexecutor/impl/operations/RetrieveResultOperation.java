@@ -16,7 +16,7 @@
 
 package com.hazelcast.durableexecutor.impl.operations;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.OperationTimeoutException;
 import com.hazelcast.durableexecutor.impl.DurableExecutorContainer;
 import com.hazelcast.durableexecutor.impl.DurableExecutorDataSerializerHook;
 import com.hazelcast.nio.Bits;
@@ -70,7 +70,7 @@ public class RetrieveResultOperation extends AbstractDurableExecutorOperation im
 
     @Override
     public void onWaitExpire() {
-        sendResponse(new HazelcastException());
+        sendResponse(new OperationTimeoutException());
     }
 
     @Override

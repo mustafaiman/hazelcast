@@ -19,9 +19,10 @@ package com.hazelcast.core;
 /**
  * Base Hazelcast exception.
  */
-public class HazelcastException extends RuntimeException {
+public abstract class HazelcastException extends RuntimeException {
 
     public HazelcastException() {
+        super();
     }
 
     public HazelcastException(final String message) {

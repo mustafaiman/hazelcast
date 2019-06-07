@@ -16,8 +16,6 @@
 
 package com.hazelcast.internal.ascii.memcache;
 
-import com.hazelcast.core.HazelcastException;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
@@ -47,7 +45,7 @@ public final class MemcacheUtils {
         try {
             return URLDecoder.decode(key, encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new HazelcastException(e);
+            throw new HazelcastUnsupportedEncodingException(e);
         }
     }
 }

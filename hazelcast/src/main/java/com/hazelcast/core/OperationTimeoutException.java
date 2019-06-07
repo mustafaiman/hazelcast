@@ -29,6 +29,7 @@ package com.hazelcast.core;
 public class OperationTimeoutException extends HazelcastException {
 
     public OperationTimeoutException() {
+        super();
     }
 
     public OperationTimeoutException(String message) {

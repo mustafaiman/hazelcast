@@ -30,9 +30,9 @@ import com.hazelcast.cp.internal.datastructures.unsafe.idgen.IdGeneratorService;
 import com.hazelcast.cp.internal.datastructures.unsafe.lock.LockService;
 import com.hazelcast.cp.internal.datastructures.unsafe.lock.LockServiceImpl;
 import com.hazelcast.cp.internal.datastructures.unsafe.semaphore.SemaphoreService;
+import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.config.ServiceConfig;
 import com.hazelcast.config.ServicesConfig;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.crdt.CRDTReplicationMigrationService;
 import com.hazelcast.crdt.pncounter.PNCounterService;
 import com.hazelcast.durableexecutor.impl.DistributedDurableExecutorService;
@@ -325,11 +325,11 @@ public final class ServiceManagerImpl implements ServiceManager {
         if (currentServiceInfo != null) {
             logger.warning("Replacing " + currentServiceInfo + " with " + serviceInfo);
             if (currentServiceInfo.isCoreService()) {
-                throw new HazelcastException("Can not replace a CoreService! Name: " + serviceName
+                throw new InvalidConfigurationException("Can not replace a CoreService! Name: " + serviceName
                         + ", Service: " + currentServiceInfo.getService());
             }
             if (currentServiceInfo.isManagedService()) {
-                shutdownService((ManagedService) currentServiceInfo.getService(), false);
+                shutdownService(currentServiceInfo.getService(), false);
             }
             services.put(serviceName, serviceInfo);
         }

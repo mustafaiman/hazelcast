@@ -30,9 +30,6 @@ import com.hazelcast.cp.lock.FencedLock;
  */
 public class LockAcquireLimitReachedException extends HazelcastException {
 
-    public LockAcquireLimitReachedException() {
-    }
-
     public LockAcquireLimitReachedException(String message) {
         super(message);
     }

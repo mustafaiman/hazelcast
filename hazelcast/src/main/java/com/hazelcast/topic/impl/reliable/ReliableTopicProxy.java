@@ -16,12 +16,10 @@
 
 package com.hazelcast.topic.impl.reliable;
 
+import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.config.ReliableTopicConfig;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstanceAware;
-import com.hazelcast.topic.ITopic;
-import com.hazelcast.topic.MessageListener;
 import com.hazelcast.monitor.LocalTopicStats;
 import com.hazelcast.monitor.impl.LocalTopicStatsImpl;
 import com.hazelcast.nio.Address;
@@ -31,6 +29,8 @@ import com.hazelcast.ringbuffer.OverflowPolicy;
 import com.hazelcast.ringbuffer.Ringbuffer;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.NodeEngine;
+import com.hazelcast.topic.ITopic;
+import com.hazelcast.topic.MessageListener;
 import com.hazelcast.topic.ReliableMessageListener;
 import com.hazelcast.topic.TopicOverloadException;
 import com.hazelcast.topic.TopicOverloadPolicy;
@@ -130,7 +130,7 @@ public class ReliableTopicProxy<E> extends AbstractDistributedObject<ReliableTop
                 Object object = ClassLoaderUtil.newInstance(nodeEngine.getConfigClassLoader(), listenerConfig.getClassName());
 
                 if (!(object instanceof MessageListener)) {
-                    throw new HazelcastException("class '"
+                    throw new InvalidConfigurationException("class '"
                             + listenerConfig.getClassName() + "' is not an instance of "
                             + MessageListener.class.getName());
                 }

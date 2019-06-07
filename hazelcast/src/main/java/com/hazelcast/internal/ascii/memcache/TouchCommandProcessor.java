@@ -37,7 +37,7 @@ public class TouchCommandProcessor extends MemcacheCommandProcessor<TouchCommand
         try {
             key = URLDecoder.decode(touchCommand.getKey(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new HazelcastException(e);
+            throw new HazelcastUnsupportedEncodingException(e);
         }
         String mapName = DEFAULT_MAP_NAME;
         int index = key.indexOf(':');

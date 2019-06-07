@@ -16,7 +16,7 @@
 
 package com.hazelcast.internal.networking.nio;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastExternalException;
 import com.hazelcast.logging.ILogger;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public final class SelectorOptimizer {
         try {
             selector = Selector.open();
         } catch (IOException e) {
-            throw new HazelcastException("Failed to open a Selector", e);
+            throw new HazelcastExternalException("Failed to open a Selector", e);
         }
 
         boolean optimize = Boolean.parseBoolean(System.getProperty("hazelcast.io.optimizeselector", "true"));

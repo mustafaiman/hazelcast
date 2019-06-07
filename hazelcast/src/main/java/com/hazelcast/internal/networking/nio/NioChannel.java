@@ -16,7 +16,7 @@
 
 package com.hazelcast.internal.networking.nio;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastExternalException;
 import com.hazelcast.internal.metrics.MetricsRegistry;
 import com.hazelcast.internal.networking.AbstractChannel;
 import com.hazelcast.internal.networking.ChannelInitializer;
@@ -109,7 +109,7 @@ public final class NioChannel extends AbstractChannel {
             socketChannel.configureBlocking(false);
             channelInitializer.initChannel(this);
         } catch (Exception e) {
-            throw new HazelcastException("Failed to start " + this, e);
+            throw new HazelcastExternalException("Failed to start " + this, e);
         }
         inboundPipeline.start();
         outboundPipeline.start();

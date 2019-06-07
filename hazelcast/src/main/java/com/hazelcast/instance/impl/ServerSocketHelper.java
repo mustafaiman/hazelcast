@@ -17,8 +17,8 @@
 package com.hazelcast.instance.impl;
 
 import com.hazelcast.config.EndpointConfig;
+import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.config.NetworkConfig;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.nio.IOUtil;
 
@@ -81,7 +81,7 @@ final class ServerSocketHelper {
             } else {
                 message += "Port [" + port + "] is already in use and auto-increment is disabled.";
             }
-            throw new HazelcastException(message, e);
+            throw new InvalidConfigurationException(message, e);
         }
     }
 

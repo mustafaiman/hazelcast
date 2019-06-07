@@ -253,7 +253,7 @@ public class ClientExceptions {
         Integer currentCode = classToInt.get(clazz);
 
         if (currentCode != null) {
-            throw new HazelcastException("Class " + clazz.getName() + " already added with code: " + currentCode);
+            throw new IllegalStateException("Class " + clazz.getName() + " already added with code: " + currentCode);
         }
 
         classToInt.put(clazz, errorCode);

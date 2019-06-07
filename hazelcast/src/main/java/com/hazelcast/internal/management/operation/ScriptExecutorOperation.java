@@ -18,6 +18,7 @@ package com.hazelcast.internal.management.operation;
 
 import com.hazelcast.config.ManagementCenterConfig;
 import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastExternalException;
 import com.hazelcast.internal.management.ManagementDataSerializerHook;
 import com.hazelcast.internal.management.ScriptEngineManagerContext;
 import com.hazelcast.nio.ObjectDataInput;
@@ -63,7 +64,7 @@ public class ScriptExecutorOperation extends AbstractManagementOperation {
             this.result = engine.eval(script);
         } catch (ScriptException e) {
             // ScriptException's cause is not serializable - we don't need the cause
-            HazelcastException hazelcastException = new HazelcastException(e.getMessage());
+            HazelcastException hazelcastException = new HazelcastExternalException(e.getMessage());
             hazelcastException.setStackTrace(e.getStackTrace());
             throw hazelcastException;
         }

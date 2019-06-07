@@ -31,9 +31,6 @@ package com.hazelcast.core;
  */
 public class RuntimeInterruptedException extends HazelcastException {
 
-    public RuntimeInterruptedException() {
-    }
-
     public RuntimeInterruptedException(String message) {
         super(message);
     }

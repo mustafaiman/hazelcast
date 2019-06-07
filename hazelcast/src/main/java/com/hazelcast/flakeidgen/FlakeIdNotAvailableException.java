@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package com.hazelcast.query;
+package com.hazelcast.flakeidgen;
 
 import com.hazelcast.core.HazelcastException;
 
-/**
- * Exception class for the Query.
- */
-public class QueryException extends HazelcastException {
-
-    public QueryException(String message) {
+public class FlakeIdNotAvailableException extends HazelcastException {
+    public FlakeIdNotAvailableException(String message) {
         super(message);
     }
 
-    public QueryException(String message, Throwable cause) {
+    public FlakeIdNotAvailableException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public QueryException(Throwable cause) {
+    public FlakeIdNotAvailableException(Throwable cause) {
         super(cause);
     }
 }

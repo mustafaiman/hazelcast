@@ -23,6 +23,7 @@ import com.hazelcast.config.CacheConfig;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.spi.NodeEngine;
+import com.hazelcast.spi.exception.ServiceNotFoundException;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
 import org.junit.Before;
@@ -104,7 +105,7 @@ public class OnJoinCacheOperationTest {
         // JCache is not available in classpath
         when(JCacheDetector.isJCacheAvailable(classLoader)).thenReturn(false);
         // node engine throws HazelcastException due to missing CacheService
-        when(nodeEngine.getService(CacheService.SERVICE_NAME)).thenThrow(new HazelcastException("CacheService not found"));
+        when(nodeEngine.getService(CacheService.SERVICE_NAME)).thenThrow(new ServiceNotFoundException("CacheService not found"));
 
         // some CacheConfigs are added in the OnJoinCacheOperation (so JCache is actually in use in the rest of the cluster)
         OnJoinCacheOperation onJoinCacheOperation = new OnJoinCacheOperation();

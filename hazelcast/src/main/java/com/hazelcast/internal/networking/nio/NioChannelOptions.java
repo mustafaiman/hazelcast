@@ -16,7 +16,7 @@
 
 package com.hazelcast.internal.networking.nio;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.internal.networking.Channel;
 import com.hazelcast.internal.networking.ChannelOption;
 import com.hazelcast.internal.networking.ChannelOptions;
@@ -75,7 +75,7 @@ final class NioChannelOptions implements ChannelOptions {
                 return (T) values.get(option.name());
             }
         } catch (SocketException e) {
-            throw new HazelcastException("Failed to getOption [" + option.name() + "]", e);
+            throw new InvalidConfigurationException("Failed to getOption [" + option.name() + "]", e);
         }
     }
 
@@ -110,7 +110,7 @@ final class NioChannelOptions implements ChannelOptions {
                 values.put(option.name(), value);
             }
         } catch (SocketException e) {
-            throw new HazelcastException("Failed to setOption [" + option.name() + "] with value [" + value + "]", e);
+            throw new InvalidConfigurationException("Failed to setOption [" + option.name() + "] with value [" + value + "]", e);
         }
 
         return this;

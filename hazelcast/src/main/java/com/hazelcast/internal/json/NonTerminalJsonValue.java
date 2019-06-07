@@ -16,7 +16,7 @@
 
 package com.hazelcast.internal.json;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastInternalException;
 
 import java.io.IOException;
 
@@ -33,6 +33,6 @@ public class NonTerminalJsonValue extends JsonValue {
 
     @Override
     void write(JsonWriter writer) throws IOException {
-        throw new HazelcastException("This object should not be encoded");
+        throw new HazelcastInternalException("This object should not be encoded");
     }
 }

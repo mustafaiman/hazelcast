@@ -14,24 +14,10 @@
  * limitations under the License.
  */
 
-package com.hazelcast.query;
+package com.hazelcast.core;
 
-import com.hazelcast.core.HazelcastException;
-
-/**
- * Exception class for the Query.
- */
-public class QueryException extends HazelcastException {
-
-    public QueryException(String message) {
-        super(message);
-    }
-
-    public QueryException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public QueryException(Throwable cause) {
+public class HazelcastExecutionException extends HazelcastException {
+    public HazelcastExecutionException(Throwable cause) {
         super(cause);
     }
 }

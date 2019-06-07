@@ -73,7 +73,7 @@ public class ConfigCompatibilityChecker {
             return false;
         }
         if (!nullSafeEqual(c1.getGroupConfig().getPassword(), c2.getGroupConfig().getPassword())) {
-            throw new HazelcastException("Incompatible group password");
+            throw new InvalidConfigurationException("Incompatible group password");
         }
 
         checkWanConfigs(c1.getWanReplicationConfigs(), c2.getWanReplicationConfigs());
@@ -135,7 +135,7 @@ public class ConfigCompatibilityChecker {
 
     public static void checkWanConfigs(Map<String, WanReplicationConfig> c1, Map<String, WanReplicationConfig> c2) {
         if ((c1 != c2 && (c1 == null || c2 == null)) || c1.size() != c2.size()) {
-            throw new HazelcastException(format("Incompatible wan replication config :\n{0}\n vs \n{1}", c1, c2));
+            throw new InvalidConfigurationException(format("Incompatible wan replication config :\n{0}\n vs \n{1}", c1, c2));
         }
         WanReplicationConfigChecker checker = new WanReplicationConfigChecker();
         for (Entry<String, WanReplicationConfig> entry : c1.entrySet()) {
@@ -158,7 +158,7 @@ public class ConfigCompatibilityChecker {
 
     private static <T> void checkCompatibleConfigs(String type, T c1, T c2, ConfigChecker<T> checker) {
         if (!checker.check(c1, c2)) {
-            throw new HazelcastException(format("Incompatible " + type + " config :\n{0}\n vs \n{1}", c1, c2));
+            throw new InvalidConfigurationException(format("Incompatible " + type + " config :\n{0}\n vs \n{1}", c1, c2));
         }
     }
 
@@ -171,13 +171,13 @@ public class ConfigCompatibilityChecker {
             T config1 = lookupByPattern(c1.getConfigPatternMatcher(), configs1, name);
             T config2 = lookupByPattern(c2.getConfigPatternMatcher(), configs2, name);
             if (config1 != null && config2 != null && !checker.check(config1, config2)) {
-                throw new HazelcastException(format("Incompatible " + type + " config :\n{0}\n vs \n{1}", config1, config2));
+                throw new InvalidConfigurationException(format("Incompatible " + type + " config :\n{0}\n vs \n{1}", config1, config2));
             }
         }
         T config1 = checker.getDefault(c1);
         T config2 = checker.getDefault(c2);
         if (!checker.check(config1, config2)) {
-            throw new HazelcastException(format("Incompatible default " + type + " config :\n{0}\n vs \n{1}", config1, config2));
+            throw new InvalidConfigurationException(format("Incompatible default " + type + " config :\n{0}\n vs \n{1}", config1, config2));
         }
     }
 

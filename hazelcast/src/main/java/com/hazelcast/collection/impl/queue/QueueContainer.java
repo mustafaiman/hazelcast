@@ -20,6 +20,7 @@ import com.hazelcast.collection.impl.txnqueue.TxQueueItem;
 import com.hazelcast.config.QueueConfig;
 import com.hazelcast.config.QueueStoreConfig;
 import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastExternalException;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.monitor.impl.LocalQueueStatsImpl;
 import com.hazelcast.nio.ObjectDataInput;
@@ -193,7 +194,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
             try {
                 load(item);
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
         getItemQueue().poll();
@@ -427,7 +428,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
             try {
                 load(item);
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
         return item;
@@ -441,7 +442,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
             try {
                 store.store(item.getItemId(), data);
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
         if (!store.isEnabled() || store.getMemoryLimit() > getItemQueue().size()) {
@@ -491,7 +492,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
             try {
                 store.storeAll(map);
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
         if (!list.isEmpty()) {
@@ -534,7 +535,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
             try {
                 load(item);
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
         return item;
@@ -555,7 +556,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
             try {
                 store.delete(item.getItemId());
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
         getItemQueue().poll();
@@ -598,7 +599,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
             try {
                 store.deleteAll(map.keySet());
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
         long current = Clock.currentTimeMillis();
@@ -621,7 +622,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
                 try {
                     load(item);
                 } catch (Exception e) {
-                    throw new HazelcastException(e);
+                    throw new HazelcastExternalException(e);
                 }
             }
             map.put(item.getItemId(), item.getData());
@@ -668,7 +669,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
             try {
                 store.deleteAll(map.keySet());
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
         getItemQueue().clear();
@@ -696,7 +697,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
                     try {
                         store.delete(item.getItemId());
                     } catch (Exception e) {
-                        throw new HazelcastException(e);
+                        throw new HazelcastExternalException(e);
                     }
                 }
                 iterator.remove();
@@ -753,7 +754,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
                 try {
                     load(item);
                 } catch (Exception e) {
-                    throw new HazelcastException(e);
+                    throw new HazelcastExternalException(e);
                 }
             }
             dataList.add(item.getData());
@@ -780,7 +781,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
                 try {
                     load(item);
                 } catch (Exception e) {
-                    throw new HazelcastException(e);
+                    throw new HazelcastExternalException(e);
                 }
             }
             boolean contains = dataList.contains(item.getData());
@@ -809,7 +810,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
             try {
                 store.deleteAll(map.keySet());
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
         Iterator<QueueItem> iterator = getItemQueue().iterator();

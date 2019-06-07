@@ -121,7 +121,7 @@ public final class FailoverClientConfigSupport {
             config = new YamlClientFailoverConfigBuilder(yamlConfigLocator).build();
 
         } else {
-            throw new HazelcastException("Failed to load ClientFailoverConfig");
+            throw new InvalidConfigurationException("Failed to load ClientFailoverConfig");
         }
         return config;
     }

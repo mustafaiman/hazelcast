@@ -312,7 +312,7 @@ public class CompositeIndexQueriesTest extends HazelcastTestSupport {
                 return value.unindexedAge;
             }
 
-            throw new QueryException();
+            throw new QueryException(randomString());
         }
 
     }

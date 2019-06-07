@@ -16,7 +16,7 @@
 
 package com.hazelcast.scheduledexecutor.impl.operations;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.OperationTimeoutException;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.scheduledexecutor.ScheduledTaskHandler;
@@ -70,7 +70,7 @@ public class GetResultOperation<V>
 
     @Override
     public void onWaitExpire() {
-        sendResponse(new HazelcastException());
+        sendResponse(new OperationTimeoutException("GetResult operation timed-out"));
     }
 
     @Override

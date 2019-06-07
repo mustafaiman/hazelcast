@@ -16,10 +16,11 @@
 
 package com.hazelcast.flakeidgen.impl;
 
-import com.hazelcast.config.FlakeIdGeneratorConfig;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.cluster.Member;
+import com.hazelcast.config.FlakeIdGeneratorConfig;
+import com.hazelcast.core.HazelcastInternalException;
 import com.hazelcast.flakeidgen.FlakeIdGenerator;
+import com.hazelcast.flakeidgen.FlakeIdNotAvailableException;
 import com.hazelcast.internal.util.ThreadLocalRandomProvider;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.spi.AbstractDistributedObject;
@@ -94,20 +95,17 @@ public class FlakeIdGeneratorProxy
         epochStart = EPOCH_START - (config.getIdOffset() >> (BITS_SEQUENCE + BITS_NODE_ID));
         nodeIdOffset = config.getNodeIdOffset();
         batcher = new AutoBatcher(config.getPrefetchCount(), config.getPrefetchValidityMillis(),
-                new AutoBatcher.IdBatchSupplier() {
-                    @Override
-                    public IdBatch newIdBatch(int batchSize) {
-                        IdBatchAndWaitTime result = FlakeIdGeneratorProxy.this.newIdBatch(batchSize);
-                        if (result.waitTimeMillis > 0) {
-                            try {
-                                Thread.sleep(result.waitTimeMillis);
-                            } catch (InterruptedException e) {
-                                currentThread().interrupt();
-                                throw rethrow(e);
-                            }
+                batchSize -> {
+                    IdBatchAndWaitTime result = FlakeIdGeneratorProxy.this.newIdBatch(batchSize);
+                    if (result.waitTimeMillis > 0) {
+                        try {
+                            Thread.sleep(result.waitTimeMillis);
+                        } catch (InterruptedException e) {
+                            currentThread().interrupt();
+                            throw rethrow(e);
                         }
-                        return result.idBatch;
                     }
+                    return result.idBatch;
                 });
 
         if (logger.isFinestEnabled()) {
@@ -184,7 +182,7 @@ public class FlakeIdGeneratorProxy
         assert (nodeId & -1 << BITS_NODE_ID) == 0  : "nodeId out of range: " + nodeId;
         now -= epochStart;
         if (now < -(1L << BITS_TIMESTAMP) || now >= (1L << BITS_TIMESTAMP)) {
-            throw new HazelcastException("Current time out of allowed range");
+            throw new HazelcastInternalException("Current time out of allowed range");
         }
         now <<= BITS_SEQUENCE;
         long oldGeneratedValue;
@@ -257,7 +255,7 @@ public class FlakeIdGeneratorProxy
                 }
             }
             if (filteredMembers.isEmpty()) {
-                throw new HazelcastException("All members have node ID out of range. Cluster restart is required");
+                throw new FlakeIdNotAvailableException("All members have node ID out of range. Cluster restart is required");
             }
             member = filteredMembers.get(ThreadLocalRandomProvider.get().nextInt(filteredMembers.size()));
             randomMember = member;

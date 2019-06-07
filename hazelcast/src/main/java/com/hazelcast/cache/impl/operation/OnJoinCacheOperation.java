@@ -19,12 +19,11 @@ package com.hazelcast.cache.impl.operation;
 import com.hazelcast.cache.impl.CacheDataSerializerHook;
 import com.hazelcast.cache.impl.ICacheService;
 import com.hazelcast.config.CacheConfig;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.exception.ServiceNotFoundException;
+import com.hazelcast.spi.impl.operationservice.Operation;
 
 import javax.cache.configuration.Configuration;
 import java.io.IOException;
@@ -73,8 +72,7 @@ public class OnJoinCacheOperation extends Operation implements IdentifiedDataSer
                 // throw the CacheService not found exception.
                 getLogger().severe("This member cannot support JCache because the cache-api artifact is missing from "
                         + "its classpath. Add the JCache API JAR in the classpath and restart the member.");
-                throw new HazelcastException("Service with name '" + SERVICE_NAME + "' not found!",
-                        new ServiceNotFoundException("Service with name '" + SERVICE_NAME + "' not found!"));
+                throw new ServiceNotFoundException("Service with name '" + SERVICE_NAME + "' not found!");
             }
         }
     }

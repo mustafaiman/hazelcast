@@ -16,10 +16,10 @@
 
 package com.hazelcast.internal.util.iterator;
 
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.MemberLeftException;
+import com.hazelcast.core.TopologyNotStableException;
 import com.hazelcast.internal.cluster.ClusterService;
 import com.hazelcast.internal.cluster.impl.ClusterTopologyChangedException;
 import com.hazelcast.internal.util.futures.ChainingFuture;
@@ -90,7 +90,7 @@ public class RestartingMemberIterator implements Iterator<Member>, ChainingFutur
 
     private void retry(Set<Member> currentMembers) {
         if (retryCounter.incrementAndGet() > maxRetries) {
-            throw new HazelcastException(format("Cluster topology was not stable for %d retries,"
+            throw new TopologyNotStableException(format("Cluster topology was not stable for %d retries,"
                     + " invoke on stable cluster failed", maxRetries));
         }
         memberQueue.clear();

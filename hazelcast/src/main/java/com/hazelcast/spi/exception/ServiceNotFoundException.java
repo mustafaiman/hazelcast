@@ -19,7 +19,7 @@ package com.hazelcast.spi.exception;
 import com.hazelcast.core.HazelcastException;
 
 /**
- * A {@link com.hazelcast.core.HazelcastException} that indicates that a requested service is not exist.
+ * Indicates that a requested service does not exist.
  */
 public class ServiceNotFoundException extends HazelcastException {
 

@@ -16,7 +16,7 @@
 
 package com.hazelcast.internal.nearcache.impl.preloader;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastExternalException;
 import com.hazelcast.logging.ILogger;
 
 import java.io.File;
@@ -56,13 +56,13 @@ class NearCachePreloaderLock {
             if (fileLock != null) {
                 return fileLock;
             }
-            throw new HazelcastException("Cannot acquire lock on " + lockFile.getAbsolutePath()
+            throw new HazelcastExternalException("Cannot acquire lock on " + lockFile.getAbsolutePath()
                     + ". File is already being used by another Hazelcast instance.");
         } catch (OverlappingFileLockException e) {
-            throw new HazelcastException("Cannot acquire lock on " + lockFile.getAbsolutePath()
+            throw new HazelcastExternalException("Cannot acquire lock on " + lockFile.getAbsolutePath()
                     + ". File is already being used by this Hazelcast instance.", e);
         } catch (IOException e) {
-            throw new HazelcastException("Unknown failure while acquiring lock on " + lockFile.getAbsolutePath(), e);
+            throw new HazelcastExternalException("Unknown failure while acquiring lock on " + lockFile.getAbsolutePath(), e);
         } finally {
             if (fileLock == null) {
                 closeResource(channel);
@@ -86,7 +86,7 @@ class NearCachePreloaderLock {
         try {
             return new RandomAccessFile(lockFile, "rw").getChannel();
         } catch (IOException e) {
-            throw new HazelcastException("Cannot create lock file " + lockFile.getAbsolutePath(), e);
+            throw new HazelcastExternalException("Cannot create lock file " + lockFile.getAbsolutePath(), e);
         }
     }
 }

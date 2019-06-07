@@ -17,6 +17,7 @@
 package com.hazelcast.spi.impl.eventservice.impl;
 
 import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastExecutionException;
 import com.hazelcast.core.MemberLeftException;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.util.FutureUtil;
@@ -42,7 +43,7 @@ public final class FutureUtilExceptionHandler implements FutureUtil.ExceptionHan
         if (throwable instanceof MemberLeftException) {
             logger.finest(message, throwable);
         } else if (throwable instanceof ExecutionException) {
-            throw new HazelcastException(throwable);
+            throw new HazelcastExecutionException(throwable);
         }
     }
 }

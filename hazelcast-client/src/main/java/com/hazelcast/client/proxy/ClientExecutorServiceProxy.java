@@ -28,15 +28,15 @@ import com.hazelcast.client.spi.impl.ClientInvocation;
 import com.hazelcast.client.spi.impl.ClientInvocationFuture;
 import com.hazelcast.client.util.ClientDelegatingFuture;
 import com.hazelcast.core.ExecutionCallback;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.IExecutorService;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.cluster.MemberSelector;
 import com.hazelcast.core.MultiExecutionCallback;
-import com.hazelcast.partition.PartitionAware;
 import com.hazelcast.monitor.LocalExecutorStats;
 import com.hazelcast.nio.Address;
 import com.hazelcast.nio.serialization.Data;
+import com.hazelcast.partition.PartitionAware;
+import com.hazelcast.spi.exception.TargetNotMemberException;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.util.Clock;
 import com.hazelcast.util.UuidUtil;
@@ -621,7 +621,7 @@ public class ClientExecutorServiceProxy extends ClientProxy implements IExecutor
     private Address getMemberAddress(Member member) {
         Member m = getContext().getClusterService().getMember(member.getUuid());
         if (m == null) {
-            throw new HazelcastException(member + " is not available!");
+            throw new TargetNotMemberException(member + " is not available!");
         }
         return m.getAddress();
     }

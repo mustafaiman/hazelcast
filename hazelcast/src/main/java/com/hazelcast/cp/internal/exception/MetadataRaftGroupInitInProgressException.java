@@ -27,4 +27,7 @@ import com.hazelcast.spi.exception.RetryableException;
 public class MetadataRaftGroupInitInProgressException extends HazelcastException implements RetryableException {
     private static final long serialVersionUID = -587586143908312910L;
 
+    public MetadataRaftGroupInitInProgressException() {
+        super("MetadataRaftGroupInitInProgressException");
+    }
 }

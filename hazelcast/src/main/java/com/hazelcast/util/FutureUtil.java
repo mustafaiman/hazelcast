@@ -16,7 +16,8 @@
 
 package com.hazelcast.util;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastExecutionException;
+import com.hazelcast.core.HazelcastInternalException;
 import com.hazelcast.core.MemberLeftException;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
@@ -89,7 +90,7 @@ public final class FutureUtil {
                     LOGGER.finest("Member left while waiting for futures...", throwable);
                 }
             } else if (throwable instanceof ExecutionException) {
-                throw new HazelcastException(throwable);
+                throw new HazelcastExecutionException(throwable);
             }
         }
     };
@@ -106,7 +107,7 @@ public final class FutureUtil {
                     LOGGER.finest("Member left while waiting for futures...", throwable);
                 }
             } else {
-                throw new HazelcastException(throwable);
+                throw new HazelcastInternalException(throwable);
             }
         }
     };

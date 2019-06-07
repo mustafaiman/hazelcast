@@ -17,7 +17,6 @@
 package com.hazelcast.config;
 
 import com.hazelcast.cache.impl.DeferredValue;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.nio.ClassLoaderUtil;
 import com.hazelcast.nio.serialization.BinaryInterface;
@@ -370,7 +369,7 @@ public abstract class AbstractCacheConfig<K, V> implements CacheConfiguration<K,
             try {
                 type = ClassLoaderUtil.loadClass(classLoader, className);
             } catch (ClassNotFoundException e) {
-                throw new HazelcastException("Could not resolve type " + className, e);
+                throw new InvalidConfigurationException("Could not resolve type " + className, e);
             }
         }
         if (type == null) {

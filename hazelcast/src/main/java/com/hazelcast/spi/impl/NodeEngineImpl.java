@@ -17,7 +17,6 @@
 package com.hazelcast.spi.impl;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.cluster.impl.MemberImpl;
 import com.hazelcast.instance.impl.Node;
@@ -49,8 +48,6 @@ import com.hazelcast.nio.Packet;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.quorum.impl.QuorumServiceImpl;
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.spi.impl.operationservice.Operation;
-import com.hazelcast.spi.impl.operationservice.PartitionAwareOperation;
 import com.hazelcast.spi.PostJoinAwareService;
 import com.hazelcast.spi.PreJoinAwareService;
 import com.hazelcast.spi.exception.RetryableHazelcastException;
@@ -61,6 +58,8 @@ import com.hazelcast.spi.impl.executionservice.InternalExecutionService;
 import com.hazelcast.spi.impl.executionservice.impl.ExecutionServiceImpl;
 import com.hazelcast.spi.impl.operationparker.OperationParker;
 import com.hazelcast.spi.impl.operationparker.impl.OperationParkerImpl;
+import com.hazelcast.spi.impl.operationservice.Operation;
+import com.hazelcast.spi.impl.operationservice.PartitionAwareOperation;
 import com.hazelcast.spi.impl.operationservice.impl.OperationServiceImpl;
 import com.hazelcast.spi.impl.proxyservice.InternalProxyService;
 import com.hazelcast.spi.impl.proxyservice.impl.ProxyServiceImpl;
@@ -362,8 +361,7 @@ public class NodeEngineImpl implements NodeEngine {
         T service = serviceManager.getService(serviceName);
         if (service == null) {
             if (isRunning()) {
-                throw new HazelcastException("Service with name '" + serviceName + "' not found!",
-                        new ServiceNotFoundException("Service with name '" + serviceName + "' not found!"));
+                throw new ServiceNotFoundException("Service with name '" + serviceName + "' not found!");
             } else {
                 throw new RetryableHazelcastException("HazelcastInstance[" + getThisAddress() + "] is not active!");
             }

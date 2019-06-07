@@ -19,6 +19,7 @@ package com.hazelcast.ringbuffer.impl;
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.config.RingbufferConfig;
 import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastExternalException;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.Data;
@@ -157,7 +158,7 @@ public class RingbufferContainer<T, E> implements IdentifiedDataSerializable, No
                     ringbuffer.setHeadSequence(storeSequence + 1);
                 }
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
     }
@@ -292,7 +293,7 @@ public class RingbufferContainer<T, E> implements IdentifiedDataSerializable, No
             try {
                 store.store(nextSequence, convertToData(item));
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
 
@@ -325,7 +326,7 @@ public class RingbufferContainer<T, E> implements IdentifiedDataSerializable, No
             try {
                 store.storeAll(firstSequence, convertToData(items));
             } catch (Exception e) {
-                throw new HazelcastException(e);
+                throw new HazelcastExternalException(e);
             }
         }
 

@@ -35,6 +35,10 @@ public class InvalidConfigurationException extends HazelcastException {
         super(message);
     }
 
+    public InvalidConfigurationException(Throwable cause) {
+        super(cause);
+    }
+
     /**
      * Constructs a new runtime exception with the specified detail message and cause.
      *

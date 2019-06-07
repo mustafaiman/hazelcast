@@ -21,6 +21,7 @@ import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.MemberLeftException;
 import com.hazelcast.core.OperationTimeoutException;
+import com.hazelcast.core.TopologyNotStableException;
 import com.hazelcast.internal.cluster.ClusterService;
 import com.hazelcast.internal.util.iterator.RestartingMemberIterator;
 import com.hazelcast.logging.ILogger;
@@ -166,7 +167,7 @@ public class ChainingFutureTest extends HazelcastTestSupport {
         assertEquals(1, iterator.getNextCounter());
         assertFalse(future.isDone());
 
-        iterator.exceptionToThrow = new HazelcastException("iterating exception");
+        iterator.exceptionToThrow = new TopologyNotStableException("iterating exception");
         future1.complete("foo");
 
         assertTrue(future.isDone());

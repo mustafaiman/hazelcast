@@ -16,7 +16,6 @@
 
 package com.hazelcast.config;
 
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.util.StringUtil;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -89,7 +88,7 @@ public final class DomConfigHelper {
     public static String cleanNodeName(final Node node) {
         final String nodeName = node.getLocalName();
         if (nodeName == null) {
-            throw new HazelcastException("Local node name is null for " + node);
+            throw new InvalidConfigurationException("Local node name is null for " + node);
         }
         return StringUtil.lowerCaseInternal(nodeName);
     }

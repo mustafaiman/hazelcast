@@ -22,6 +22,7 @@ import com.hazelcast.core.HazelcastException;
 import com.hazelcast.instance.impl.DefaultNodeContext;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.nio.tcp.TcpIpNetworkingService;
+import com.hazelcast.spi.exception.ServiceNotFoundException;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.impl.eventservice.impl.EventServiceImpl;
 import com.hazelcast.spi.impl.executionservice.impl.ExecutionServiceImpl;
@@ -50,7 +51,7 @@ import static org.junit.Assert.fail;
 public class NodeThreadLeakTest extends HazelcastTestSupport {
 
     private static final HazelcastException HAZELCAST_EXCEPTION
-            = new HazelcastException("Test exception - Emulates service failure.");
+            = new ServiceNotFoundException("Test exception - Emulates service failure.");
 
     @Test
     public void testLeakWhenCreatingConnectionManager() throws Exception {

@@ -25,8 +25,8 @@ import com.hazelcast.client.impl.protocol.codec.ErrorCodec;
 import com.hazelcast.client.impl.protocol.exception.MaxMessageSizeExceeded;
 import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.core.ConsistencyLostException;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
+import com.hazelcast.core.HazelcastInternalException;
 import com.hazelcast.core.HazelcastOverloadException;
 import com.hazelcast.core.IndeterminateOperationStateException;
 import com.hazelcast.core.LocalMemberResetException;
@@ -248,12 +248,6 @@ public class ClientExceptionFactory {
             @Override
             public Throwable createException(String message, Throwable cause) {
                 return new ExecutionException(message, cause);
-            }
-        });
-        register(ClientProtocolErrorCodes.HAZELCAST, HazelcastException.class, new ExceptionFactory() {
-            @Override
-            public Throwable createException(String message, Throwable cause) {
-                return new HazelcastException(message, cause);
             }
         });
         register(ClientProtocolErrorCodes.HAZELCAST_INSTANCE_NOT_ACTIVE, HazelcastInstanceNotActiveException.class, new ExceptionFactory() {
@@ -783,11 +777,11 @@ public class ClientExceptionFactory {
     @SuppressWarnings("WeakerAccess")
     public void register(int errorCode, Class clazz, ExceptionFactory exceptionFactory) {
         if (intToFactory.containsKey(errorCode)) {
-            throw new HazelcastException("Code " + errorCode + " already used");
+            throw new HazelcastInternalException("Code " + errorCode + " already used");
         }
 
         if (!clazz.equals(exceptionFactory.createException("", null).getClass())) {
-            throw new HazelcastException("Exception factory did not produce an instance of expected class");
+            throw new HazelcastInternalException("Exception factory did not produce an instance of expected class");
         }
 
         intToFactory.put(errorCode, exceptionFactory);

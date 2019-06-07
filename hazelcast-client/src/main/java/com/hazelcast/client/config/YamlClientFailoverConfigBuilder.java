@@ -106,7 +106,7 @@ public class YamlClientFailoverConfigBuilder extends AbstractYamlConfigBuilder {
         }
 
         if (!locator.isConfigPresent()) {
-            throw new HazelcastException("Failed to load ClientFailoverConfig");
+            throw new InvalidConfigurationException("Failed to load ClientFailoverConfig");
         }
 
         this.in = locator.getIn();

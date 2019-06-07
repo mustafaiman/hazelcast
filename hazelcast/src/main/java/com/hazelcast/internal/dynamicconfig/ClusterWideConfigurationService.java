@@ -41,7 +41,6 @@ import com.hazelcast.config.ScheduledExecutorConfig;
 import com.hazelcast.config.SemaphoreConfig;
 import com.hazelcast.config.SetConfig;
 import com.hazelcast.config.TopicConfig;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.internal.cluster.ClusterService;
 import com.hazelcast.internal.cluster.ClusterVersionListener;
@@ -616,7 +615,7 @@ public class ClusterWideConfigurationService implements PreJoinAwareService,
                 }, CONFIG_PUBLISH_MAX_ATTEMPT_COUNT);
                 waitForever(singleton(future), FutureUtil.RETHROW_EVERYTHING);
             } catch (Exception e) {
-                throw new HazelcastException("Error while merging configurations", e);
+                throw new InvalidConfigurationException("Error while merging configurations", e);
             }
         }
     }

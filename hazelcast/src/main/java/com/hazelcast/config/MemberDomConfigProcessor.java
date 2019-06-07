@@ -152,7 +152,7 @@ class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
         } else if (NETWORK.isEqual(nodeName)) {
             handleNetwork(node);
         } else if (IMPORT.isEqual(nodeName)) {
-            throw new HazelcastException("Non-expanded <import> element found");
+            throw new InvalidConfigurationException("Non-expanded <import> element found");
         } else if (GROUP.isEqual(nodeName)) {
             handleGroup(node);
         } else if (PROPERTIES.isEqual(nodeName)) {
@@ -974,13 +974,13 @@ class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                         : arg == boolean.class ? getBooleanValue(argument)
                         : null;
         if (coercedArg == null) {
-            throw new HazelcastException(String.format(
+            throw new InvalidConfigurationException(String.format(
                     "Method %s has unsupported argument type %s", method.getName(), arg.getSimpleName()));
         }
         try {
             method.invoke(target, coercedArg);
         } catch (Exception e) {
-            throw new HazelcastException(e);
+            throw new InvalidConfigurationException(e);
         }
     }
 
@@ -991,7 +991,7 @@ class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
             attacher = getMethod(parent, "add" + targetName, false);
         }
         if (attacher == null) {
-            throw new HazelcastException(String.format(
+            throw new InvalidConfigurationException(String.format(
                     "%s doesn't accept %s as child", parent.getClass().getSimpleName(), targetName));
         }
         attacher.invoke(parent, child);

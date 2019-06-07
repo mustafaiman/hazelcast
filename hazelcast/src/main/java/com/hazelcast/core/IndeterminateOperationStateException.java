@@ -40,9 +40,6 @@ import com.hazelcast.spi.properties.GroupProperty;
  */
 public class IndeterminateOperationStateException extends HazelcastException {
 
-    public IndeterminateOperationStateException() {
-    }
-
     public IndeterminateOperationStateException(String message) {
         super(message);
     }

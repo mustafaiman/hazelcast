@@ -109,7 +109,7 @@ public class XmlClientFailoverConfigBuilder extends AbstractXmlConfigBuilder {
 
         boolean located = locator.isConfigPresent();
         if (!located) {
-            throw new HazelcastException("Failed to load ClientFailoverConfig");
+            throw new InvalidConfigurationException("Failed to load ClientFailoverConfig");
         }
 
         this.in = locator.getIn();

@@ -44,7 +44,6 @@ import com.hazelcast.config.MapAttributeConfig;
 import com.hazelcast.config.MapIndexConfig;
 import com.hazelcast.config.NearCachePreloaderConfig;
 import com.hazelcast.config.WanReplicationRef;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.hazelcast.core.HazelcastOverloadException;
 import com.hazelcast.cluster.Member;
@@ -608,7 +607,6 @@ public class ReferenceObjects {
     public static long aLong = -50992225L;
     public static String aString = "SampleString";
     public static UUID aUUID = new UUID(123456789, 987654321);
-    public static Throwable aThrowable = new HazelcastException(aString);
     public static Data aData = new HeapData("111313123131313131".getBytes());
     public static Address anAddress;
 
@@ -800,8 +798,7 @@ public class ReferenceObjects {
             aString), new CallerNotMemberException(aString), new CancellationException(aString), new ClassCastException(
             aString), new ClassNotFoundException(aString), new ConcurrentModificationException(
             aString), new ConfigMismatchException(aString), new DistributedObjectDestroyedException(aString), new EOFException(
-            aString), new ExecutionException(new IOException()), new HazelcastException(
-            aString), new HazelcastInstanceNotActiveException(aString), new HazelcastOverloadException(
+            aString), new ExecutionException(new IOException()), new HazelcastInstanceNotActiveException(aString), new HazelcastOverloadException(
             aString), new HazelcastSerializationException(aString), new IOException(aString), new IllegalArgumentException(
             aString), new IllegalAccessException(aString), new IllegalAccessError(aString), new IllegalMonitorStateException(
             aString), new IllegalStateException(aString), new IllegalThreadStateException(aString), new IndexOutOfBoundsException(

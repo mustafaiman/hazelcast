@@ -18,6 +18,7 @@ package com.hazelcast.nio;
 
 import com.hazelcast.config.EndpointConfig;
 import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastExternalException;
 import com.hazelcast.internal.networking.Channel;
 import com.hazelcast.internal.networking.ChannelOptions;
 import com.hazelcast.logging.Logger;
@@ -416,7 +417,7 @@ public final class IOUtil {
             }
         }
         if (!f.delete()) {
-            throw new HazelcastException("Failed to delete " + f);
+            throw new HazelcastExternalException("Failed to delete " + f);
         }
     }
 
@@ -433,19 +434,19 @@ public final class IOUtil {
             return;
         }
         if (!fileNow.exists()) {
-            throw new HazelcastException(format("Failed to rename %s to %s because %s doesn't exist.",
+            throw new HazelcastExternalException(format("Failed to rename %s to %s because %s doesn't exist.",
                     fileNow, fileToBe, fileNow));
         }
         if (!fileToBe.exists()) {
-            throw new HazelcastException(format("Failed to rename %s to %s even though %s doesn't exist.",
+            throw new HazelcastExternalException(format("Failed to rename %s to %s even though %s doesn't exist.",
                     fileNow, fileToBe, fileToBe));
         }
         if (!fileToBe.delete()) {
-            throw new HazelcastException(format("Failed to rename %s to %s. %s exists and could not be deleted.",
+            throw new HazelcastExternalException(format("Failed to rename %s to %s. %s exists and could not be deleted.",
                     fileNow, fileToBe, fileToBe));
         }
         if (!fileNow.renameTo(fileToBe)) {
-            throw new HazelcastException(format("Failed to rename %s to %s even after deleting %s.",
+            throw new HazelcastExternalException(format("Failed to rename %s to %s even after deleting %s.",
                     fileNow, fileToBe, fileToBe));
         }
     }
@@ -487,7 +488,7 @@ public final class IOUtil {
             //noinspection ConstantConditions
             return new File(resource.toURI());
         } catch (Exception e) {
-            throw new HazelcastException("Could not find resource file " + resourceFileName, e);
+            throw new HazelcastExternalException("Could not find resource file " + resourceFileName, e);
         }
     }
 
@@ -495,7 +496,7 @@ public final class IOUtil {
         try {
             return IOUtil.class.getClassLoader().getResourceAsStream(resourceFileName);
         } catch (Exception e) {
-            throw new HazelcastException("Could not find resource file " + resourceFileName, e);
+            throw new HazelcastExternalException("Could not find resource file " + resourceFileName, e);
         }
     }
 
@@ -511,7 +512,7 @@ public final class IOUtil {
                 fos = new FileOutputStream(file);
             }
             if (!file.setLastModified(System.currentTimeMillis())) {
-                throw new HazelcastException("Could not touch file " + file.getAbsolutePath());
+                throw new HazelcastExternalException("Could not touch file " + file.getAbsolutePath());
             }
         } catch (IOException e) {
             throw rethrow(e);
@@ -556,7 +557,7 @@ public final class IOUtil {
      */
     public static void copy(InputStream source, File target) {
         if (!target.exists()) {
-            throw new HazelcastException("The target file doesn't exist " + target.getAbsolutePath());
+            throw new HazelcastExternalException("The target file doesn't exist " + target.getAbsolutePath());
         }
 
         FileOutputStream out = null;
@@ -569,7 +570,7 @@ public final class IOUtil {
                 out.write(buff, 0, length);
             }
         } catch (Exception e) {
-            throw new HazelcastException("Error occurred while copying InputStream", e);
+            throw new HazelcastExternalException("Error occurred while copying InputStream", e);
         } finally {
             closeResource(out);
         }
@@ -593,7 +594,7 @@ public final class IOUtil {
             throw new IllegalArgumentException("Source is not a file " + source.getAbsolutePath());
         }
         if (!target.exists() && !target.mkdirs()) {
-            throw new HazelcastException("Could not create the target directory " + target.getAbsolutePath());
+            throw new HazelcastExternalException("Could not create the target directory " + target.getAbsolutePath());
         }
         final File destination = target.isDirectory() ? new File(target, source.getName()) : target;
         FileInputStream in = null;
@@ -606,7 +607,7 @@ public final class IOUtil {
             final long transferCount = sourceCount > 0 ? sourceCount : inChannel.size();
             inChannel.transferTo(0, transferCount, outChannel);
         } catch (Exception e) {
-            throw new HazelcastException("Error occurred while copying file", e);
+            throw new HazelcastExternalException("Error occurred while copying file", e);
         } finally {
             closeResource(in);
             closeResource(out);
@@ -620,11 +621,11 @@ public final class IOUtil {
         }
         final File targetSubDir = new File(target, source.getName());
         if (!targetSubDir.exists() && !targetSubDir.mkdirs()) {
-            throw new HazelcastException("Could not create the target directory " + target);
+            throw new HazelcastExternalException("Could not create the target directory " + target);
         }
         final File[] sourceFiles = source.listFiles();
         if (sourceFiles == null) {
-            throw new HazelcastException("Error occurred while listing directory contents for copy");
+            throw new HazelcastExternalException("Error occurred while listing directory contents for copy");
         }
         for (File file : sourceFiles) {
             copy(file, targetSubDir);

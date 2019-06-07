@@ -151,7 +151,7 @@ public class RaftSemaphoreService extends AbstractBlockingService<AcquireInvocat
             return;
         }
 
-        notifyWaitKeys(groupId, name, keys, new WaitKeyCancelledException());
+        notifyWaitKeys(groupId, name, keys, new WaitKeyCancelledException("WaitKeyCancelled"));
     }
 
     @Override

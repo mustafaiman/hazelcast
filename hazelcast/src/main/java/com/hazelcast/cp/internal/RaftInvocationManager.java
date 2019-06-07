@@ -16,8 +16,8 @@
 
 package com.hazelcast.cp.internal;
 
+import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.core.ExecutionCallback;
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.cp.CPGroupId;
 import com.hazelcast.cp.internal.exception.CannotCreateRaftGroupException;
@@ -35,8 +35,8 @@ import com.hazelcast.internal.util.SimpleCompletedFuture;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.spi.InternalCompletableFuture;
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.impl.NodeEngineImpl;
+import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.impl.operationservice.impl.Invocation;
 import com.hazelcast.spi.impl.operationservice.impl.OperationServiceImpl;
 import com.hazelcast.spi.impl.operationservice.impl.RaftInvocation;
@@ -104,7 +104,7 @@ public class RaftInvocationManager {
 
     private <V> InternalCompletableFuture<V> completeExceptionallyIfCPSubsystemNotAvailable() {
         if (!cpSubsystemEnabled) {
-            return new SimpleCompletedFuture<>(new HazelcastException("CP Subsystem is not enabled!"));
+            return new SimpleCompletedFuture<>(new InvalidConfigurationException("CP Subsystem is not enabled!"));
         }
         return null;
     }

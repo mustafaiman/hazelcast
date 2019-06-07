@@ -21,6 +21,7 @@ import com.hazelcast.config.ServiceConfig;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.spi.InitializingObject;
 import com.hazelcast.spi.NodeEngine;
+import com.hazelcast.spi.exception.ServiceNotFoundException;
 import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.impl.operationservice.OperationService;
 import com.hazelcast.spi.RemoteService;
@@ -324,7 +325,7 @@ public class DistributedObjectTest extends HazelcastTestSupport {
 
         @Override
         public DistributedObject createDistributedObject(String objectName) {
-            throw new HazelcastException("Object creation is not allowed!");
+            throw new ServiceNotFoundException("Object creation is not allowed!");
         }
 
         @Override

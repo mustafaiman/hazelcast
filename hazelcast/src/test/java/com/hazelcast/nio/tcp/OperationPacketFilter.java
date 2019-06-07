@@ -16,7 +16,7 @@
 
 package com.hazelcast.nio.tcp;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.HazelcastInternalException;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.nio.Address;
 import com.hazelcast.nio.ObjectDataInput;
@@ -51,7 +51,7 @@ public abstract class OperationPacketFilter implements PacketFilter {
                 return filterOperation(endpoint, factory, type);
             }
         } catch (IOException e) {
-            throw new HazelcastException(e);
+            throw new HazelcastInternalException(e);
         }
         return Action.ALLOW;
     }

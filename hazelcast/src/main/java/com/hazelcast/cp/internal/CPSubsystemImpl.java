@@ -16,14 +16,14 @@
 
 package com.hazelcast.cp.internal;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.config.InvalidConfigurationException;
+import com.hazelcast.cp.CPMember;
+import com.hazelcast.cp.CPSubsystem;
+import com.hazelcast.cp.CPSubsystemManagementService;
 import com.hazelcast.cp.IAtomicLong;
 import com.hazelcast.cp.IAtomicReference;
 import com.hazelcast.cp.ICountDownLatch;
 import com.hazelcast.cp.ISemaphore;
-import com.hazelcast.cp.CPMember;
-import com.hazelcast.cp.CPSubsystem;
-import com.hazelcast.cp.CPSubsystemManagementService;
 import com.hazelcast.cp.internal.datastructures.atomiclong.RaftAtomicLongService;
 import com.hazelcast.cp.internal.datastructures.atomicref.RaftAtomicRefService;
 import com.hazelcast.cp.internal.datastructures.countdownlatch.RaftCountDownLatchService;
@@ -91,7 +91,7 @@ public class CPSubsystemImpl implements CPSubsystem {
     @Override
     public CPSubsystemManagementService getCPSubsystemManagementService() {
         if (instance.getConfig().getCPSubsystemConfig().getCPMemberCount() == 0) {
-            throw new HazelcastException("CP Subsystem is not enabled!");
+            throw new InvalidConfigurationException("CP Subsystem is not enabled!");
         }
         return instance.node.getNodeEngine().getService(RaftService.SERVICE_NAME);
     }
@@ -99,7 +99,7 @@ public class CPSubsystemImpl implements CPSubsystem {
     @Override
     public CPSessionManagementService getCPSessionManagementService() {
         if (instance.getConfig().getCPSubsystemConfig().getCPMemberCount() == 0) {
-            throw new HazelcastException("CP Subsystem is not enabled!");
+            throw new InvalidConfigurationException("CP Subsystem is not enabled!");
         }
         return instance.node.getNodeEngine().getService(RaftSessionService.SERVICE_NAME);
     }

@@ -23,9 +23,6 @@ import com.hazelcast.core.HazelcastException;
  */
 public class TransactionNotActiveException extends HazelcastException {
 
-    public TransactionNotActiveException() {
-    }
-
     public TransactionNotActiveException(String message) {
         super(message);
     }

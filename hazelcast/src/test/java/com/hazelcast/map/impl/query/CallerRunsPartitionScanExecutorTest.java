@@ -32,6 +32,7 @@ import org.junit.runner.RunWith;
 
 import java.util.Collection;
 
+import static com.hazelcast.test.HazelcastTestSupport.randomString;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
@@ -66,7 +67,7 @@ public class CallerRunsPartitionScanExecutorTest {
         Predicate predicate = Predicates.equal("attribute", 1);
         QueryResult queryResult = new QueryResult(IterationType.ENTRY, null, null, Long.MAX_VALUE, false);
 
-        doThrow(new QueryException()).when(runner).run(anyString(), eq(predicate), anyInt(), eq(queryResult));
+        doThrow(new QueryException(randomString())).when(runner).run(anyString(), eq(predicate), anyInt(), eq(queryResult));
 
         expected.expect(QueryException.class);
         executor.execute("Map", predicate, asList(1, 2, 3), queryResult);

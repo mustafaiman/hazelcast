@@ -117,7 +117,7 @@ public class RaftLockService extends AbstractBlockingService<LockInvocationKey, 
             return;
         }
 
-        notifyWaitKeys(groupId, name, keys, new WaitKeyCancelledException());
+        notifyWaitKeys(groupId, name, keys, new WaitKeyCancelledException("WaitKeyCancelled"));
     }
 
     public RaftLockOwnershipState getLockOwnershipState(CPGroupId groupId, String name) {

@@ -16,13 +16,13 @@
 
 package com.hazelcast.durableexecutor.impl.operations;
 
-import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.OperationTimeoutException;
 import com.hazelcast.durableexecutor.impl.DurableExecutorContainer;
 import com.hazelcast.durableexecutor.impl.DurableExecutorDataSerializerHook;
 import com.hazelcast.nio.Bits;
 import com.hazelcast.spi.impl.operationservice.BlockingOperation;
-import com.hazelcast.spi.impl.operationservice.WaitNotifyKey;
 import com.hazelcast.spi.impl.operationservice.MutatingOperation;
+import com.hazelcast.spi.impl.operationservice.WaitNotifyKey;
 
 public class RetrieveAndDisposeResultOperation extends DisposeResultOperation implements BlockingOperation,
         MutatingOperation {
@@ -61,7 +61,7 @@ public class RetrieveAndDisposeResultOperation extends DisposeResultOperation im
 
     @Override
     public void onWaitExpire() {
-        sendResponse(new HazelcastException());
+        sendResponse(new OperationTimeoutException());
     }
 
     @Override
