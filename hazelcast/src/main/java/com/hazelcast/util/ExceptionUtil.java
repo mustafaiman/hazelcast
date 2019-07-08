@@ -17,7 +17,7 @@
 package com.hazelcast.util;
 
 
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.instance.impl.OutOfMemoryErrorDispatcher;
 
 import java.io.PrintWriter;
@@ -36,9 +36,9 @@ public final class ExceptionUtil {
         @Override
         public RuntimeException create(Throwable throwable, String message) {
             if (message != null) {
-                return new HazelcastInternalException(message, throwable);
+                return new HazelcastSystemException(message, throwable);
             } else {
-                return new HazelcastInternalException(throwable);
+                return new HazelcastSystemException(throwable);
             }
         }
     };

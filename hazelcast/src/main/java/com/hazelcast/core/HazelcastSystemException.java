@@ -16,16 +16,17 @@
 
 package com.hazelcast.core;
 
-public class HazelcastInternalException extends HazelcastException {
-    public HazelcastInternalException(String message) {
+public class HazelcastSystemException extends HazelcastException {
+
+    public HazelcastSystemException(String message) {
         super(message);
     }
 
-    public HazelcastInternalException(String message, Throwable cause) {
+    public HazelcastSystemException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public HazelcastInternalException(Throwable cause) {
+    public HazelcastSystemException(Throwable cause) {
         super(cause);
     }
 }

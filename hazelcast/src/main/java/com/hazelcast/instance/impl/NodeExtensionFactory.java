@@ -16,7 +16,7 @@
 
 package com.hazelcast.instance.impl;
 
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.logging.Logger;
 import com.hazelcast.util.ExceptionUtil;
 import com.hazelcast.util.ServiceLoader;
@@ -81,7 +81,7 @@ public final class NodeExtensionFactory {
                 }
             }
             if (chosenExtension == null) {
-                throw new HazelcastInternalException("ServiceLoader didn't find any services registered under "
+                throw new HazelcastSystemException("ServiceLoader didn't find any services registered under "
                         + NODE_EXTENSION_FACTORY_ID);
             }
             return chosenExtension.getConstructor(Node.class).newInstance(node);

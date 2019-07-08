@@ -20,7 +20,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.json.ReaderBasedJsonParser;
 import com.fasterxml.jackson.core.json.UTF8StreamJsonParser;
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.internal.json.JsonReducedValueParser;
 import com.hazelcast.internal.json.JsonValue;
 import com.hazelcast.internal.json.NonTerminalJsonValue;
@@ -144,7 +144,7 @@ public final class JsonSchemaHelper {
                     int valuePos = ((JsonSchemaTerminalNode) schemaNode).getValueStartLocation();
                     return input.parseValue(valueParser, valuePos);
                 } catch (ParseException parseException) {
-                    throw new HazelcastInternalException(parseException);
+                    throw new HazelcastSystemException(parseException);
                 }
             } else {
                 return NonTerminalJsonValue.INSTANCE;
@@ -213,7 +213,7 @@ public final class JsonSchemaHelper {
         } else if (parser instanceof UTF8StreamJsonParser) {
             return parser.getTokenLocation().getByteOffset();
         } else {
-            throw new HazelcastInternalException("Provided parser does not support location: "
+            throw new HazelcastSystemException("Provided parser does not support location: "
                     + parser.getClass().getName());
         }
     }

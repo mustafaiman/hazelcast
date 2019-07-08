@@ -16,13 +16,14 @@
 
 package com.hazelcast.spi.exception;
 
+import com.hazelcast.core.HazelcastException;
 import com.hazelcast.nio.Address;
 
 /**
  * A {@link RetryableHazelcastException} that indicates that an operation was sent by a machine which isn't member
  * in the cluster when the operation is executed.
  */
-public class CallerNotMemberException extends RetryableHazelcastException {
+public class CallerNotMemberException extends HazelcastException implements RetryableException {
 
     public CallerNotMemberException(Address thisAddress, Address caller, int partitionId,
             String operationName, String serviceName) {

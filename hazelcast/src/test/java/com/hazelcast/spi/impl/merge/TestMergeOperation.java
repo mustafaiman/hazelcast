@@ -16,7 +16,7 @@
 
 package com.hazelcast.spi.impl.merge;
 
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.spi.impl.operationservice.Operation;
 
 import java.util.concurrent.CountDownLatch;
@@ -52,7 +52,7 @@ class TestMergeOperation extends Operation {
         hasBeenInvoked = true;
         switch (operationMode) {
             case THROWS_EXCEPTION:
-                throw new HazelcastInternalException("Expected exception");
+                throw new HazelcastSystemException("Expected exception");
             case BLOCKS:
                 try {
                     latch.await();

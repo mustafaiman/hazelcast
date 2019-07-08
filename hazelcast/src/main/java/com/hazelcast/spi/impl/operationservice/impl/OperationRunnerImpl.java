@@ -24,7 +24,7 @@ import com.hazelcast.cluster.impl.MemberImpl;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.instance.impl.NodeState;
 import com.hazelcast.instance.impl.OutOfMemoryErrorDispatcher;
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.internal.metrics.MetricsProvider;
 import com.hazelcast.internal.metrics.MetricsRegistry;
 import com.hazelcast.internal.metrics.Probe;
@@ -444,7 +444,7 @@ class OperationRunnerImpl extends OperationRunner implements MetricsProvider {
         OperationResponseHandler handler = outboundResponseHandler;
         if (op.getCallId() == 0) {
             if (op.returnsResponse()) {
-                throw new HazelcastInternalException(
+                throw new HazelcastSystemException(
                         "Operation " + op + " wants to return a response, but doesn't have a call ID");
             }
             handler = createEmptyResponseHandler();

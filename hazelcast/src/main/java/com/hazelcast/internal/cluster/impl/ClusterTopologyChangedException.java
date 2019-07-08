@@ -16,12 +16,13 @@
 
 package com.hazelcast.internal.cluster.impl;
 
-import com.hazelcast.spi.exception.RetryableHazelcastException;
+import com.hazelcast.core.HazelcastException;
+import com.hazelcast.spi.exception.RetryableException;
 
 /**
  * Thrown when a cluster topology change is detected.
  */
-public class ClusterTopologyChangedException extends RetryableHazelcastException {
+public class ClusterTopologyChangedException extends HazelcastException implements RetryableException {
 
     public ClusterTopologyChangedException() {
     }

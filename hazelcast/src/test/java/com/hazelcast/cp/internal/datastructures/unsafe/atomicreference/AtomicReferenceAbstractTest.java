@@ -18,7 +18,7 @@ package com.hazelcast.cp.internal.datastructures.unsafe.atomicreference;
 
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.core.IFunction;
 import com.hazelcast.cp.IAtomicReference;
 import com.hazelcast.test.HazelcastTestSupport;
@@ -297,7 +297,7 @@ public abstract class AtomicReferenceAbstractTest extends HazelcastTestSupport {
     protected static class FailingFunction implements IFunction<String, String> {
         @Override
         public String apply(String input) {
-            throw new HazelcastInternalException(randomString());
+            throw new HazelcastSystemException(randomString());
         }
     }
 

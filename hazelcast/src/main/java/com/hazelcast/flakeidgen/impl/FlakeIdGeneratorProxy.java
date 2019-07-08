@@ -18,7 +18,7 @@ package com.hazelcast.flakeidgen.impl;
 
 import com.hazelcast.cluster.Member;
 import com.hazelcast.config.FlakeIdGeneratorConfig;
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.flakeidgen.FlakeIdGenerator;
 import com.hazelcast.flakeidgen.FlakeIdNotAvailableException;
 import com.hazelcast.internal.util.ThreadLocalRandomProvider;
@@ -182,7 +182,7 @@ public class FlakeIdGeneratorProxy
         assert (nodeId & -1 << BITS_NODE_ID) == 0  : "nodeId out of range: " + nodeId;
         now -= epochStart;
         if (now < -(1L << BITS_TIMESTAMP) || now >= (1L << BITS_TIMESTAMP)) {
-            throw new HazelcastInternalException("Current time out of allowed range");
+            throw new HazelcastSystemException("Current time out of allowed range");
         }
         now <<= BITS_SEQUENCE;
         long oldGeneratedValue;

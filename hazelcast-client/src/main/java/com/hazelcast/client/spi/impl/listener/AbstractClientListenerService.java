@@ -28,7 +28,7 @@ import com.hazelcast.client.spi.impl.ClientInvocation;
 import com.hazelcast.client.spi.impl.ClientInvocationFuture;
 import com.hazelcast.client.spi.impl.ListenerMessageCodec;
 import com.hazelcast.client.spi.properties.ClientProperty;
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.internal.metrics.MetricsProvider;
 import com.hazelcast.internal.metrics.MetricsRegistry;
 import com.hazelcast.internal.metrics.Probe;
@@ -121,7 +121,7 @@ public abstract class AbstractClientListenerService implements ClientListenerSer
                     } catch (Exception e) {
                         if (connection.isAlive()) {
                             deregisterListenerInternal(userRegistrationId);
-                            throw new HazelcastInternalException("Listener can not be added ", e);
+                            throw new HazelcastSystemException("Listener can not be added ", e);
                         }
 
                     }

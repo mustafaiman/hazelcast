@@ -73,7 +73,7 @@ import com.hazelcast.core.DistributedObjectListener;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.cp.IAtomicLong;
 import com.hazelcast.cluster.Member;
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.core.OperationTimeoutException;
 import com.hazelcast.crdt.pncounter.PNCounterService;
 import com.hazelcast.durableexecutor.impl.DistributedDurableExecutorService;
@@ -283,7 +283,7 @@ public final class ProxyManager {
         try {
             register(serviceName, (id, context) -> instantiateClientProxy(proxyType, serviceName, context, id));
         } catch (Exception e) {
-            throw new HazelcastInternalException("Factory for service " + serviceName + " could not be created for " + proxyType, e);
+            throw new HazelcastSystemException("Factory for service " + serviceName + " could not be created for " + proxyType, e);
         }
     }
 

@@ -19,7 +19,7 @@ package com.hazelcast.query.impl.getters;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.internal.json.JsonValue;
 import com.hazelcast.internal.json.NonTerminalJsonValue;
 import com.hazelcast.internal.serialization.impl.NavigableJsonInputAdapter;
@@ -96,7 +96,7 @@ public abstract class AbstractJsonGetter extends Getter {
 
     @Override
     Object getValue(Object obj) {
-        throw new HazelcastInternalException("Path agnostic value extraction is not supported");
+        throw new HazelcastSystemException("Path agnostic value extraction is not supported");
     }
 
     @Override

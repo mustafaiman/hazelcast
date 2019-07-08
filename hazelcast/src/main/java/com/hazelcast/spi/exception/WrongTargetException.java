@@ -17,12 +17,13 @@
 package com.hazelcast.spi.exception;
 
 import com.hazelcast.cluster.Member;
+import com.hazelcast.core.HazelcastException;
 
 /**
  * A {@link com.hazelcast.spi.exception.RetryableHazelcastException} indicating that an operation is executed on
  * a wrong member.
  */
-public class WrongTargetException extends RetryableHazelcastException {
+public class WrongTargetException extends HazelcastException implements RetryableException {
 
     // RU_COMPAT
     private static final long serialVersionUID = -84600702836709317L;

@@ -16,7 +16,8 @@
 
 package com.hazelcast.crdt;
 
-import com.hazelcast.spi.exception.RetryableHazelcastException;
+import com.hazelcast.core.HazelcastException;
+import com.hazelcast.spi.exception.RetryableException;
 
 /**
  * Exception that indicates that the receiver of a CRDT operation is not
@@ -27,7 +28,7 @@ import com.hazelcast.spi.exception.RetryableHazelcastException;
  *
  * @since 3.10
  */
-public class TargetNotReplicaException extends RetryableHazelcastException {
+public class TargetNotReplicaException extends HazelcastException implements RetryableException {
     public TargetNotReplicaException(String message) {
         super(message);
     }

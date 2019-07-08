@@ -17,7 +17,7 @@
 package com.hazelcast.util;
 
 import com.hazelcast.core.HazelcastExternalException;
-import com.hazelcast.core.HazelcastInternalException;
+import com.hazelcast.core.HazelcastSystemException;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import com.hazelcast.nio.ClassLoaderUtil;
@@ -291,7 +291,7 @@ public final class ServiceLoader {
                 }
                 return constructor.newInstance();
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                throw new HazelcastInternalException(e);
+                throw new HazelcastSystemException(e);
             }
         }
 
