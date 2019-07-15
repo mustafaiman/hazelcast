@@ -755,4 +755,34 @@ public class MapPredicateJsonTest extends HazelcastTestSupport {
         Collection<Integer> keys = map.keySet(Predicates.equal("user", null));
         assertEquals(1, keys.size());
     }
+
+    @Test
+    public void testKeyWith4ByteUTF8Char() {
+        final String testKey = "loudly crying face:\uD83D\uDE2D nerd face: \uD83E\uDD13";
+        String json = Json.object()
+                .add(testKey, "value")
+                .toString();
+
+        IMap<Integer, HazelcastJsonValue> map = instance.getMap(randomMapName());
+        map.put(1, new HazelcastJsonValue(json));
+
+        Collection<HazelcastJsonValue> vals = map.values(Predicates.equal(testKey, "value"));
+        assertEquals(1, vals.size());
+        assertEquals(json, vals.iterator().next().toString());
+    }
+
+    @Test
+    public void testValueWith4ByteUTF8Char() {
+        final String testValue = "loudly crying face:\uD83D\uDE2D nerd face: \uD83E\uDD13";
+        String json = Json.object()
+                .add("key", testValue)
+                .toString();
+
+        IMap<Integer, HazelcastJsonValue> map = instance.getMap(randomMapName());
+        map.put(1, new HazelcastJsonValue(json));
+
+        Collection<HazelcastJsonValue> vals = map.values(Predicates.equal("key", "loudly crying face:\uD83D\uDE2D nerd face: \uD83E\uDD13"));
+        assertEquals(1, vals.size());
+        assertEquals(json, vals.iterator().next().toString());
+    }
 }

@@ -20,14 +20,10 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.hazelcast.internal.json.JsonReducedValueParser;
 import com.hazelcast.internal.json.JsonValue;
-import com.hazelcast.nio.Bits;
 import com.hazelcast.nio.BufferObjectDataInput;
 import com.hazelcast.query.impl.getters.JsonPathCursor;
 
-import java.io.DataInput;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.Reader;
 
 public class DataInputNavigableJsonAdapter extends NavigableJsonInputAdapter {
 
@@ -76,7 +72,7 @@ public class DataInputNavigableJsonAdapter extends NavigableJsonInputAdapter {
     @Override
     public JsonValue parseValue(JsonReducedValueParser parser, int offset) throws IOException {
         input.position(offset + initialOffset);
-        return parser.parse(new UTF8Reader(input));
+        return parser.parse(new Utf8Reader(input));
     }
 
     @Override
@@ -88,37 +84,4 @@ public class DataInputNavigableJsonAdapter extends NavigableJsonInputAdapter {
         return input.readByte() == '"';
     }
 
-    private static class UTF8Reader extends Reader {
-
-        private final DataInput input;
-
-        UTF8Reader(DataInput input) {
-            this.input = input;
-        }
-
-        @Override
-        public int read(char[] cbuf, int off, int len) throws IOException {
-            if (off < 0 || (off + len) > cbuf.length) {
-                throw new IndexOutOfBoundsException();
-            }
-            int i = 0;
-            try {
-                for (i = 0; i < len; i++) {
-                    byte firstByte = input.readByte();
-                    char c = Bits.readUtf8Char(input, firstByte);
-                    cbuf[off + i] = c;
-                }
-            } catch (EOFException e) {
-                if (i == 0) {
-                    return -1;
-                }
-            }
-            return i;
-        }
-
-        @Override
-        public void close() throws IOException {
-
-        }
-    }
 }
